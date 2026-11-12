@@ -178,6 +178,214 @@ window.App = (function () {
     });
 
     updateMathParametersDisplay();
+    updateParamsTable();
+    updateForcesDiagramSVG();
+    updateDynamicSubstitutedEDO();
+  }
+
+  /**
+   * Actualiza la tabla formal de parámetros en la sección 4
+   */
+  function updateParamsTable() {
+    const elM = document.getElementById('tbl-val-m');
+    const elT = document.getElementById('tbl-val-T');
+    const elG = document.getElementById('tbl-val-g');
+    const elK = document.getElementById('tbl-val-k');
+    const elV0 = document.getElementById('tbl-val-v0');
+    const elY0 = document.getElementById('tbl-val-y0');
+    const elTf = document.getElementById('tbl-val-tFinal');
+    const elH = document.getElementById('tbl-val-h');
+
+    if (elM) elM.textContent = formatNumber(state.m, 0, 0);
+    if (elT) elT.textContent = formatNumber(state.T, 0, 0);
+    if (elG) elG.textContent = formatNumber(state.g, 2, 2);
+    if (elK) elK.textContent = formatNumber(state.k, 0, 1);
+    if (elV0) elV0.textContent = formatNumber(state.v0, 2, 2);
+    if (elY0) elY0.textContent = formatNumber(state.y0, 2, 2);
+    if (elTf) elTf.textContent = `0 a ${formatNumber(state.tFinal, 0, 0)}`;
+    if (elH) elH.textContent = formatNumber(state.h, 2, 2);
+  }
+
+  /**
+   * Actualiza las flechas y rótulos del diagrama interactivo de fuerzas en SVG
+   */
+  function updateForcesDiagramSVG() {
+    const labelThrust = document.getElementById('label-thrust');
+    const labelGravity = document.getElementById('label-gravity');
+    const labelDrag = document.getElementById('label-drag');
+
+    const arrowLineThrust = document.getElementById('arrow-line-thrust');
+    const arrowHeadThrust = document.getElementById('arrow-head-thrust');
+    const arrowLineGravity = document.getElementById('arrow-line-gravity');
+    const arrowHeadGravity = document.getElementById('arrow-head-gravity');
+
+    const weightVal = state.m * state.g;
+
+    // Actualizar textos en el SVG
+    if (labelThrust) {
+      labelThrust.textContent = `T = ${formatNumber(state.T, 0, 0)} N`;
+    }
+    if (labelGravity) {
+      labelGravity.textContent = `mg = ${formatNumber(weightVal, 0, 0)} N`;
+    }
+    if (labelDrag) {
+      labelDrag.textContent = `Fres = ${formatNumber(state.k, 0, 0)}·v N`;
+    }
+
+    // Escalar visualmente las flechas en función de T y mg
+    // Longitud base normalizada entre 40px y 95px
+    if (arrowLineThrust && arrowHeadThrust) {
+      const thrustScale = Math.min(95, Math.max(40, (state.T / 15000) * 75));
+      const yEndThrust = 115 - thrustScale;
+      arrowLineThrust.setAttribute('y2', yEndThrust);
+      arrowHeadThrust.setAttribute('points', `140,${yEndThrust - 8} 133,${yEndThrust + 6} 147,${yEndThrust + 6}`);
+      if (labelThrust) {
+        labelThrust.setAttribute('y', yEndThrust + 5);
+      }
+    }
+
+    if (arrowLineGravity && arrowHeadGravity) {
+      const gravityScale = Math.min(95, Math.max(35, (weightVal / 9810) * 70));
+      const yEndGravity = 175 + gravityScale;
+      arrowLineGravity.setAttribute('y2', yEndGravity);
+      arrowHeadGravity.setAttribute('points', `133,${yEndGravity + 8} 127,${yEndGravity - 6} 139,${yEndGravity - 6}`);
+      if (labelGravity) {
+        labelGravity.setAttribute('y', yEndGravity);
+      }
+    }
+
+    // Actualizar inspector si hay una fuerza actualmente seleccionada
+    if (activeForceInspected) {
+      displayForceInfo(activeForceInspected);
+    }
+  }
+
+  /**
+   * Actualiza dinámicamente la ecuación sustituida con los valores actuales de T, m, g, k
+   */
+  function updateDynamicSubstitutedEDO() {
+    const container = document.getElementById('dynamic-substituted-edo');
+    if (!container) return;
+
+    const m = state.m || 1000;
+    const T = state.T || 15000;
+    const g = state.g || 9.81;
+    const k = state.k || 100;
+
+    const a0 = (T / m) - g;
+    const beta = k / m;
+
+    const a0Formatted = formatNumber(a0, 2, 2);
+    const betaFormatted = formatNumber(beta, 1, 3);
+
+    container.innerHTML = `
+      $$\\begin{cases} 
+        \\dfrac{dy}{dt} = v \\\\[8pt] 
+        \\dfrac{dv}{dt} = ${a0Formatted} - ${betaFormatted} v 
+      \\end{cases}$$
+    `;
+
+    // Re-renderizar fórmula con MathJax si está activo
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([container]).catch((err) => console.warn('MathJax err:', err));
+    }
+  }
+
+  /**
+   * Estado y lógica del inspector interactivo de vectores de fuerza en SVG
+   */
+  let activeForceInspected = null;
+
+  const forceDataMap = {
+    thrust: {
+      name: 'Fuerza de Empuje Propulsor',
+      symbol: 'T',
+      variable: 'T (Newtons)',
+      direction: 'Hacia arriba (+y, sentido del movimiento)',
+      getMagnitude: () => `${formatNumber(state.T, 0, 0)} N`,
+      description: 'Fuerza impulsora ascendente generada por los motores cohete mediante la expulsión de gases a alta velocidad. Es la única fuerza que aporta aceleración positiva para vencer la gravedad y el rozamiento del aire.'
+    },
+    gravity: {
+      name: 'Peso Gravitacional',
+      symbol: 'F_g = m · g',
+      variable: 'P = m · g (Newtons)',
+      direction: 'Hacia abajo (-y, sentido contrario al ascenso)',
+      getMagnitude: () => `${formatNumber(state.m * state.g, 0, 1)} N (${formatNumber(state.m, 0, 0)} kg × ${formatNumber(state.g, 2, 2)} m/s²)`,
+      description: 'Atracción gravitatoria ejercida por la masa terrestre sobre el cohete. Se asume una aceleración de la gravedad constante g = 9,81 m/s² en la proximidad de la superficie.'
+    },
+    drag: {
+      name: 'Resistencia Aerodinámica Lineal',
+      symbol: 'F_{res} = k · v',
+      variable: 'F_res = k · v (Newtons)',
+      direction: 'Hacia abajo (-y, opuesta al vector velocidad)',
+      getMagnitude: () => `${formatNumber(state.k, 0, 1)} kg/s × v(t) N`,
+      description: 'Fuerza de fricción y arrastre viscoso ejercida por el aire atmosférico. Al tratarse de un modelo lineal (k · v), la fuerza de frenado crece proporcionalmente a la velocidad instantánea del vehículo.'
+    }
+  };
+
+  function displayForceInfo(forceKey) {
+    const data = forceDataMap[forceKey];
+    if (!data) return;
+
+    const titleEl = document.getElementById('inspector-force-name');
+    const symbolEl = document.getElementById('inspector-force-symbol');
+    const descEl = document.getElementById('inspector-force-desc');
+    const metaBox = document.getElementById('inspector-force-meta');
+    const varEl = document.getElementById('meta-var');
+    const valEl = document.getElementById('meta-val');
+    const dirEl = document.getElementById('meta-dir');
+
+    if (titleEl) titleEl.textContent = data.name;
+    if (symbolEl) symbolEl.textContent = `[${data.symbol}]`;
+    if (descEl) descEl.textContent = data.description;
+    if (varEl) varEl.textContent = data.variable;
+    if (valEl) valEl.textContent = data.getMagnitude();
+    if (dirEl) dirEl.textContent = data.direction;
+    if (metaBox) metaBox.style.display = 'flex';
+  }
+
+  function resetForceInfo() {
+    if (activeForceInspected) {
+      displayForceInfo(activeForceInspected);
+      return;
+    }
+    const titleEl = document.getElementById('inspector-force-name');
+    const symbolEl = document.getElementById('inspector-force-symbol');
+    const descEl = document.getElementById('inspector-force-desc');
+    const metaBox = document.getElementById('inspector-force-meta');
+
+    if (titleEl) titleEl.textContent = 'INSPECTOR DE VECTORES DE FUERZA';
+    if (symbolEl) symbolEl.textContent = '(Interactúa con el gráfico)';
+    if (descEl) descEl.textContent = 'Pasa el cursor o pulsa sobre cualquiera de las 3 flechas vectoriales en el diagrama para examinar su formulación física, sentido en el eje vertical y magnitud instantánea.';
+    if (metaBox) metaBox.style.display = 'none';
+  }
+
+  function setupForceInspectorInteraction() {
+    const forceGroups = document.querySelectorAll('.force-arrow-group');
+
+    forceGroups.forEach((group) => {
+      const forceKey = group.getAttribute('data-force');
+
+      group.addEventListener('mouseenter', () => {
+        displayForceInfo(forceKey);
+      });
+
+      group.addEventListener('mouseleave', () => {
+        resetForceInfo();
+      });
+
+      group.addEventListener('click', () => {
+        forceGroups.forEach((g) => g.classList.remove('active'));
+        if (activeForceInspected === forceKey) {
+          activeForceInspected = null;
+          resetForceInfo();
+        } else {
+          activeForceInspected = forceKey;
+          group.classList.add('active');
+          displayForceInfo(forceKey);
+        }
+      });
+    });
   }
 
   /**
@@ -394,6 +602,7 @@ window.App = (function () {
     bindInputEvents();
     setupScrollSpy();
     syncUIWithState();
+    setupForceInspectorInteraction();
     startMissionClock();
 
     // Inicializar contenedor SVG de simulación si está disponible

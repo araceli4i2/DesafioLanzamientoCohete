@@ -486,80 +486,143 @@
   <section id="planteamiento-problema" class="section-wrapper">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Mecánica de Vuelo</span>
+        <span class="section-tag">Mecánica de Vuelo • Escenario 1962</span>
         <h2 class="section-title">Planteamiento del Problema Físico</h2>
         <p class="section-subtitle">
-          Dinámica vertical de un cohete propulsado sometido a empuje ascendente, atracción gravitatoria y resistencia aerodinámica lineal.
+          Simulación del ascenso vertical de un cohete experimental ficticio durante sus primeros 20 segundos de vuelo impulsado, determinando la evolución de su velocidad y altitud.
         </p>
       </div>
 
       <div class="problem-grid">
+        <!-- Columna Izquierda: Escenario y 5 Preguntas del Estudiante -->
         <div class="console-panel">
           <div class="panel-header-bar">
-            <span class="panel-title-text">BALANCE DE FUERZAS EN ASCENSO VERTICAL</span>
+            <span class="panel-title-text">ESCENARIO DEL LANZAMIENTO</span>
             <span class="panel-status-led"></span>
           </div>
 
           <p>
-            Consideramos un vehículo espacial de masa $m = 1.000\text{ kg}$ en trayectoria vertical unidimensional desde la plataforma de despegue. Sobre el cohete actúan exactamente tres fuerzas:
+            Nos encontramos en Cabo Cañaveral, año 1962. Como matemáticos del equipo de control de vuelo, se nos encomienda predecir la trayectoria vertical de un <strong>cohete experimental de prueba</strong> de una sola etapa. El vehículo parte en reposo absoluto desde la plataforma de despegue ($y(0) = 0\text{ m}$, $v(0) = 0\text{ m/s}$) y enciende su motor durante los primeros $20\text{ segundos}$ ($t \in [0, 20\text{ s}]$).
           </p>
 
-          <ul class="problem-list">
-            <li>
-              <span class="bullet-icon">▲</span>
-              <div>
-                <strong>Empuje del motor ($T$):</strong> Fuerza propulsora constante hacia arriba generada por la tobera, con un valor de $T = 15.000\text{ N}$.
-              </div>
-            </li>
-            <li>
-              <span class="bullet-icon">▼</span>
-              <div>
-                <strong>Peso gravitacional ($m \cdot g$):</strong> Fuerza de atracción hacia abajo ejercida por la Tierra, con $g = 9,81\text{ m/s}²$. Para $m = 1.000\text{ kg}$, el peso equivale a $m \cdot g = 9.810\text{ N}$.
-              </div>
-            </li>
-            <li>
-              <span class="bullet-icon">▼</span>
-              <div>
-                <strong>Resistencia aerodinámica LINEAL ($k \cdot v$):</strong> Fuerza de fricción viscosa con el aire opuesta a la velocidad, directamente proporcional a $v$ con constante de resistencia $k = 100\text{ kg/s}$.
-              </div>
-            </li>
-          </ul>
+          <p style="margin-top: 0.75rem; color: var(--text-muted); font-size: 0.95rem;">
+            El ascenso se modela sobre un <strong>eje vertical con sentido positivo hacia arriba ($+y$)</strong>, bajo la acción combinada de la fuerza de propulsión de los motores, la atracción gravitacional terrestre y la resistencia aerodinámica viscosa del aire.
+          </p>
 
-          <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(56, 189, 248, 0.08); border-radius: var(--radius-sm);">
-            <strong>Fuerza Neta Vertical:</strong>
-            $$F_{neta} = T - m \cdot g - k \cdot v$$
-            <strong>Objetivo Computacional:</strong> Calcular la altitud $y(t)$ y la velocidad $v(t)$ durante el intervalo $t \in [0, 20\text{ s}]$, partiendo del reposo en la plataforma: $y(0) = 0\text{ m}$, $v(0) = 0\text{ m/s}$.
+          <!-- Tarjeta con las 5 preguntas del estudiante -->
+          <div class="student-questions-panel">
+            <div class="panel-header-bar" style="margin-bottom: 0.5rem; padding-bottom: 0.5rem;">
+              <span class="panel-title-text" style="font-size: 0.95rem; color: var(--mission-orange);">
+                DESAFÍO DEL CALCULISTA: 5 PREGUNTAS CLAVE
+              </span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">GUÍA DE INVESTIGACIÓN</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem;">
+              Para garantizar el éxito de la misión, tu modelo y métodos numéricos deberán responder formalmente a estas 5 interrogantes:
+            </p>
+
+            <ul class="student-questions-list">
+              <li class="question-item">
+                <span class="question-num">1</span>
+                <span class="question-text">¿Cuál es la velocidad del cohete a los 2 s, 4 s, 10 s y 20 s de vuelo?</span>
+              </li>
+              <li class="question-item">
+                <span class="question-num">2</span>
+                <span class="question-text">¿Qué altitud alcanza el vehículo al cumplirse los 20 segundos de simulación?</span>
+              </li>
+              <li class="question-item">
+                <span class="question-num">3</span>
+                <span class="question-text">¿Cuál es la solución analítica exacta de la ecuación diferencial del movimiento?</span>
+              </li>
+              <li class="question-item">
+                <span class="question-num">4</span>
+                <span class="question-text">¿Qué discrepancias y errores cuantitativos existen entre el método de Euler y la solución exacta?</span>
+              </li>
+              <li class="question-item">
+                <span class="question-num">5</span>
+                <span class="question-text">¿Qué ocurre con la precisión del modelo si reducimos el paso $h$ de 2 s a 1 s, 0,5 s y 0,25 s?</span>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div class="forces-diagram-box">
-          <h4 style="margin-bottom: 1rem; color: var(--sky-blue); font-family: var(--font-mono);">DIAGRAMA DE CUERPO LIBRE</h4>
-          <svg class="forces-diagram-svg" viewBox="0 0 240 320" fill="none">
-            <!-- Cohete esquemático -->
-            <rect x="105" y="100" width="30" height="110" rx="4" fill="#0d1e3d" stroke="#00e5ff" stroke-width="2" />
-            <polygon points="105,100 135,100 120,60" fill="#ff6b35" />
-            <polygon points="95,190 105,170 105,210" fill="#38bdf8" />
-            <polygon points="145,190 135,170 135,210" fill="#38bdf8" />
-            <circle cx="120" cy="150" r="4" fill="#ffffff" />
+        <!-- Columna Derecha: Diagrama Interactivo de Fuerzas en SVG -->
+        <div class="forces-interactive-box">
+          <div class="panel-header-bar" style="width: 100%;">
+            <span class="panel-title-text">DIAGRAMA INTERACTIVO DE FUERZAS</span>
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">EJE VERTICAL (+y)</span>
+          </div>
 
-            <!-- Vector Empuje T hacia arriba -->
-            <line x1="120" y1="60" x2="120" y2="15" stroke="#00e5ff" stroke-width="3" />
-            <polygon points="120,10 114,24 126,24" fill="#00e5ff" />
-            <text x="135" y="26" fill="#00e5ff" font-family="'Share Tech Mono'" font-size="13" font-weight="bold">T = 15.000 N</text>
+          <!-- SVG con vectores interactivos de fuerza -->
+          <svg id="svg-forces-diagram" class="forces-diagram-svg" viewBox="0 0 280 360" fill="none">
+            <!-- Eje de referencia coordenado (+y hacia arriba) -->
+            <line x1="25" y1="340" x2="25" y2="25" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 2" />
+            <polygon points="25,18 21,28 29,28" fill="#38bdf8" />
+            <text x="35" y="28" fill="#38bdf8" font-family="'Share Tech Mono'" font-size="12" font-weight="bold">+y (Arriba)</text>
+            <circle cx="25" cy="335" r="3" fill="#38bdf8" />
+            <text x="35" y="340" fill="#64748b" font-family="'Share Tech Mono'" font-size="10">y(0) = 0</text>
 
-            <!-- Vector Gravedad Fg hacia abajo -->
-            <line x1="110" y1="210" x2="110" y2="280" stroke="#f59e0b" stroke-width="3" />
-            <polygon points="110,288 104,274 116,274" fill="#f59e0b" />
-            <text x="10" y="275" fill="#f59e0b" font-family="'Share Tech Mono'" font-size="12">mg = 9.810 N</text>
+            <!-- Plataforma base -->
+            <rect x="70" y="335" width="140" height="12" fill="#1e293b" stroke="#38bdf8" stroke-width="1" />
+            <line x1="80" y1="341" x2="200" y2="341" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="6 4" />
 
-            <!-- Vector Resistencia LINEAL Fres hacia abajo -->
-            <line x1="130" y1="210" x2="130" y2="265" stroke="#ef4444" stroke-width="3" />
-            <polygon points="130,273 124,259 136,259" fill="#ef4444" />
-            <text x="142" y="260" fill="#ef4444" font-family="'Share Tech Mono'" font-size="12">Fres = k·v</text>
+            <!-- Silueta esquemática del cohete central -->
+            <g id="svg-diagram-rocket" transform="translate(125, 120)">
+              <!-- Tobera y aletas -->
+              <polygon points="3,80 15,65 15,90" fill="#475569" stroke="#64748b" />
+              <polygon points="27,80 15,65 15,90" fill="#475569" stroke="#64748b" />
+              <polygon points="10,85 20,85 22,95 8,95" fill="#334155" stroke="#f59e0b" />
+              <!-- Cuerpo cilíndrico -->
+              <rect x="6" y="20" width="18" height="65" rx="2" fill="#0d1e3d" stroke="#00e5ff" stroke-width="1.5" />
+              <!-- Ojiva cónica -->
+              <polygon points="6,20 24,20 15,2" fill="#ff6b35" />
+              <!-- Centro de masa (punto de aplicación de fuerzas) -->
+              <circle cx="15" cy="50" r="4.5" fill="#f8fafc" stroke="#00e5ff" stroke-width="1.5" />
+            </g>
+
+            <!-- 1. VECTOR EMPUJE T (Hacia arriba, +y) -->
+            <g id="vector-thrust" class="force-arrow-group" data-force="thrust">
+              <line id="arrow-line-thrust" x1="140" y1="115" x2="140" y2="35" stroke="#00e5ff" stroke-width="3.5" stroke-linecap="round" />
+              <polygon id="arrow-head-thrust" points="140,26 133,40 147,40" fill="#00e5ff" />
+              <text id="label-thrust" x="155" y="42" fill="#00e5ff" font-family="'Share Tech Mono'" font-size="13" font-weight="bold">
+                T = 15.000 N
+              </text>
+            </g>
+
+            <!-- 2. VECTOR PESO mg (Hacia abajo, -y) -->
+            <g id="vector-gravity" class="force-arrow-group" data-force="gravity">
+              <line id="arrow-line-gravity" x1="133" y1="175" x2="133" y2="255" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" />
+              <polygon id="arrow-head-gravity" points="133,263 127,249 139,249" fill="#f59e0b" />
+              <text id="label-gravity" x="15" y="255" fill="#f59e0b" font-family="'Share Tech Mono'" font-size="12">
+                mg = 9.810 N
+              </text>
+            </g>
+
+            <!-- 3. VECTOR RESISTENCIA kv (Hacia abajo, -y) -->
+            <g id="vector-drag" class="force-arrow-group" data-force="drag">
+              <line id="arrow-line-drag" x1="147" y1="175" x2="147" y2="235" stroke="#ef4444" stroke-width="3" stroke-linecap="round" />
+              <polygon id="arrow-head-drag" points="147,243 141,229 153,229" fill="#ef4444" />
+              <text id="label-drag" x="155" y="240" fill="#ef4444" font-family="'Share Tech Mono'" font-size="12">
+                Fres = 100·v N
+              </text>
+            </g>
           </svg>
-          <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); text-align: center; margin-top: 0.5rem;">
-            Ecuación de equilibrio dinámico: $F_{neta} = T - mg - kv$
-          </span>
+
+          <!-- Inspector Dinámico de Fuerzas (Reactivo a Hover / Clic) -->
+          <div id="force-inspector-panel" class="force-inspector-panel">
+            <div class="inspector-title">
+              <span id="inspector-force-name">INSPECTOR DE VECTORES DE FUERZA</span>
+              <span id="inspector-force-symbol" style="color: var(--electric-blue); font-weight: bold;">(Interactúa con el gráfico)</span>
+            </div>
+            <p id="inspector-force-desc" class="inspector-desc">
+              Pasa el cursor o pulsa sobre cualquiera de las 3 flechas vectoriales en el diagrama para examinar su formulación física, sentido en el eje vertical y magnitud instantánea.
+            </p>
+            <div id="inspector-force-meta" class="inspector-meta" style="display: none;">
+              <span class="meta-item">Variable: <strong id="meta-var">--</strong></span>
+              <span class="meta-item">Magnitud actual: <strong id="meta-val">--</strong></span>
+              <span class="meta-item">Orientación: <strong id="meta-dir">--</strong></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -571,60 +634,164 @@
   <section id="modelo-matematico" class="section-wrapper">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Ecuaciones Diferenciales</span>
+        <span class="section-tag">Fundamentación Dinámica</span>
         <h2 class="section-title">Modelo Matemático del Vuelo</h2>
         <p class="section-subtitle">
-          Formulación del problema de valor inicial con resistencia lineal y parámetros numéricos del desafío.
+          Deducción rigurosa de las Ecuaciones Diferenciales Ordinarias (EDO), balance de fuerzas en el eje $+y$ y parametrización canónica.
         </p>
       </div>
 
+      <!-- Deducción formal en dos columnas de ecuaciones -->
       <div class="math-equations-container">
+        <!-- EDO General de Newton -->
         <div class="equation-card">
-          <div class="equation-card-title">SEGUNDA LEY DE NEWTON (EDO LINEAL)</div>
+          <div class="equation-card-title">1. SEGUNDA LEY DE NEWTON (EJE VERTICAL $+y$)</div>
+          <p style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">
+            Tomando como positivo el sentido ascendente ($+y$), el empuje $T$ impulsa hacia arriba, mientras el peso $mg$ y la resistencia lineal $kv$ frenan el avance:
+          </p>
           <div class="equation-render">
             $$m \frac{dv}{dt} = T - m g - k v$$
           </div>
-          <p style="font-size: 0.9rem; color: var(--text-muted);">
-            Dividiendo entre la masa $m$, obtenemos la aceleración instantánea:
+          <p style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">
+            Dividiendo miembro a miembro por la masa inercial $m$:
           </p>
-          <div class="equation-render" style="font-size: 1.05rem; color: var(--sky-blue);">
+          <div class="equation-render" style="color: var(--sky-blue); font-size: 1.15rem;">
             $$\frac{dv}{dt} = \frac{T}{m} - g - \frac{k}{m} v$$
           </div>
         </div>
 
+        <!-- EDO Sustituida con los Datos de la Misión -->
         <div class="equation-card">
-          <div class="equation-card-title">SUSTITUCIÓN CON LOS DATOS DEL DESAFÍO</div>
-          <p style="font-size: 0.88rem; color: var(--text-muted); text-align: left; margin-bottom: 0.5rem;">
-            Con $m = 1.000\text{ kg}$, $T = 15.000\text{ N}$, $g = 9,81\text{ m/s}²$ y $k = 100\text{ kg/s}$:
+          <div class="equation-card-title">2. SISTEMA EN ESPACIO DE ESTADOS SUSTITUIDO</div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); text-align: left;">
+            Sustituyendo los parámetros oficiales: $m = 1.000\text{ kg}$, $T = 15.000\text{ N}$, $g = 9,81\text{ m/s}²$ y $k = 100\text{ kg/s}$:
           </p>
-          <div class="equation-render">
+          <div class="equation-render" style="font-size: 1rem; color: var(--text-dim);">
             $$\frac{T}{m} - g = \frac{15.000}{1.000} - 9,81 = 15 - 9,81 = 5,19$$
             $$\frac{k}{m} = \frac{100}{1.000} = 0,1$$
           </div>
-          <div class="equation-render" style="font-size: 1.15rem; color: var(--electric-blue);">
+          <div id="dynamic-substituted-edo" class="equation-render" style="color: var(--electric-blue); font-size: 1.25rem;">
             $$\begin{cases} 
               \dfrac{dy}{dt} = v \\[8pt] 
               \dfrac{dv}{dt} = 5,19 - 0,1 v 
             \end{cases}$$
           </div>
-          <p style="font-size: 0.85rem; color: var(--text-dim);">
-            Condiciones iniciales: $v(0) = 0\text{ m/s}$, $y(0) = 0\text{ m}$.
+          <p style="font-size: 0.85rem; color: var(--text-dim); text-align: left;">
+            Sujeto a las condiciones de valor inicial en plataforma: $v(0) = 0\text{ m/s}$, $y(0) = 0\text{ m}$.
           </p>
         </div>
       </div>
 
+      <!-- Presentación 1: Tabla Estructurada de Parámetros -->
+      <div class="params-table-wrapper">
+        <div class="panel-header-bar" style="margin-bottom: 0.75rem;">
+          <span class="panel-title-text">TABLA DE PARÁMETROS DEL ESTADO COMPARTIDO</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">DEFINICIÓN CANÓNICA</span>
+        </div>
+        <table class="params-table">
+          <thead>
+            <tr>
+              <th>Símbolo</th>
+              <th>Parámetro Físico</th>
+              <th>Valor Oficial</th>
+              <th>Unidad SI</th>
+              <th>Descripción y Rol en el Modelo</th>
+            </tr>
+          </thead>
+          <tbody id="params-table-body">
+            <tr>
+              <td class="symbol-cell">$m$</td>
+              <td>Masa del cohete</td>
+              <td class="val-cell" id="tbl-val-m">1.000</td>
+              <td class="unit-cell">kg</td>
+              <td>Masa inercial constante del vehículo durante el vuelo de prueba.</td>
+            </tr>
+            <tr>
+              <td class="symbol-cell">$T$</td>
+              <td>Fuerza de empuje</td>
+              <td class="val-cell" id="tbl-val-T">15.000</td>
+              <td class="unit-cell">N</td>
+              <td>Fuerza propulsora ascendente neta constante generada por los motores.</td>
+            </tr>
+            <tr>
+              <td class="symbol-cell">$g$</td>
+              <td>Aceleración gravitacional</td>
+              <td class="val-cell" id="tbl-val-g">9,81</td>
+              <td class="unit-cell">m/s²</td>
+              <td>Atracción gravitatoria terrestre local uniforme sobre la plataforma.</td>
+            </tr>
+            <tr>
+              <td class="symbol-cell">$k$</td>
+              <td>Resistencia aerodinámica lineal</td>
+              <td class="val-cell" id="tbl-val-k">100</td>
+              <td class="unit-cell">kg/s</td>
+              <td>Coeficiente de arrastre viscoso lineal proporcional a la velocidad ($F_{res} = k \cdot v$).</td>
+            </tr>
+            <tr>
+              <td class="symbol-cell">$v(0)$</td>
+              <td>Velocidad inicial</td>
+              <td class="val-cell" id="tbl-val-v0">0,00</td>
+              <td class="unit-cell">m/s</td>
+              <td>Condición de partida en reposo sobre la torre de lanzamiento.</td>
+            </tr>
+            <tr>
+              <td class="symbol-cell">$y(0)$</td>
+              <td>Altitud inicial</td>
+              <td class="val-cell" id="tbl-val-y0">0,00</td>
+              <td class="unit-cell">m</td>
+              <td>Origen de coordenadas espaciales fijado al nivel del suelo.</td>
+            </tr>
+            <tr>
+              <td class="symbol-cell">$t$</td>
+              <td>Ventana de simulación</td>
+              <td class="val-cell" id="tbl-val-tFinal">0 a 20</td>
+              <td class="unit-cell">s</td>
+              <td>Intervalo temporal continuo de integración balística ($t \in [0, 20\text{ s}]$).</td>
+            </tr>
+            <tr>
+              <td class="symbol-cell">$h$</td>
+              <td>Paso temporal inicial</td>
+              <td class="val-cell" id="tbl-val-h">2,00</td>
+              <td class="unit-cell">s</td>
+              <td>Intervalo discreto base $\Delta t$ evaluado para el algoritmo de Euler.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Presentación 2: Tarjetas Métricas Compartidas -->
       <div class="console-panel">
         <div class="panel-header-bar">
-          <span class="panel-title-text">PARÁMETROS COMPARTIDOS DEL DESAFÍO (ESTADO CENTRAL)</span>
+          <span class="panel-title-text">TARJETAS MÉTRICAS DEL ESTADO CENTRAL</span>
           <span class="panel-status-led"></span>
         </div>
-        <p style="font-size: 0.9rem; color: var(--text-muted);">
-          Todas las secciones consumen exactamente estos parámetros centralizados en <code>app.js</code>:
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Lecturas numéricas enlazadas en tiempo real con el almacén reactivo central de <code>app.js</code>:
         </p>
         <div id="math-params-summary" class="param-summary-grid">
-          <!-- Inyectado dinámicamente por app.js con formato en coma decimal -->
+          <!-- Inyectado y sincronizado dinámicamente por app.js con formato en coma decimal -->
         </div>
       </div>
+
+      <!-- Advertencia Visible: Modelo Idealizado -->
+      <div class="idealized-model-warning">
+        <div class="warning-icon-box">⚠</div>
+        <div class="warning-content-box">
+          <h4>ADVERTENCIA DE MODELADO FÍSICO — MODELO IDEALIZADO (USO DIDÁCTICO)</h4>
+          <p>
+            Este simulador científico emplea un <strong>modelo físico idealizado</strong> con masa constante, empuje uniforme, gravedad invariable y resistencia aerodinámica estrictamente lineal. En un lanzamiento espacial real de la NASA:
+          </p>
+          <ul style="margin-left: 1.25rem; font-size: 0.9rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            <li><strong>Consumo masivo de propergol:</strong> Un cohete químico quema toneladas de combustible por segundo, de modo que su masa $m(t)$ disminuye drásticamente a lo largo del tiempo conforme a la <em>Ecuación del Cohete de Tsiolkovsky</em>, incrementando enormemente la aceleración.</li>
+            <li><strong>Gradiente atmosférico exponencial:</strong> La densidad del aire $\rho(y)$ decae con la altura ($\rho(y) \approx \rho_0 e^{-y/H}$), por lo que el rozamiento disminuye progresivamente en las capas altas.</li>
+            <li><strong>Régimen aerodinámico no lineal y transónico:</strong> La resistencia a velocidades astronáuticas es cuadrática ($F_d \propto v^2$) y experimenta picos críticos de presión dinámica (Max-Q) y ondas de choque al atravesar la barrera del sonido (Mach 1).</li>
+          </ul>
+          <p style="color: var(--mission-amber); font-weight: 500;">
+            Por tanto, este sistema está concebido con fines estrictamente pedagógicos para el aprendizaje, verificación y contrastación de métodos numéricos, y <strong>no constituye una predicción balística operativa para misiones reales</strong>.
+          </p>
+        </div>
+      </div>
+
     </div>
   </section>
 
