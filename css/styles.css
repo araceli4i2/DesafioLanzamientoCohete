@@ -1555,7 +1555,476 @@ code, pre, .mono {
 }
 
 /* --------------------------------------------------------------------------
-   14. RESPONSIVE DESIGN (DESKTOP, TABLET, MOBILE)
+   14. ESTILOS DE LA SECCIÓN MÉTODO DE EULER & COMPONENTES NUMÉRICOS
+   -------------------------------------------------------------------------- */
+.simultaneity-rule-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-left: 4px solid var(--mission-amber);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.simultaneity-rule-box .rule-icon {
+  font-size: 1.4rem;
+  color: var(--mission-amber);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.simultaneity-rule-box .rule-content {
+  font-size: 0.88rem;
+  color: #fef08a;
+  line-height: 1.5;
+}
+
+.simultaneity-rule-box .rule-content strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.euler-params-deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.15rem;
+}
+
+.euler-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-error-msg {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #f87171;
+  margin-top: 0.35rem;
+  min-height: 16px;
+  line-height: 1.2;
+}
+
+.param-input.input-has-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.45) !important;
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+.euler-alert-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-left: 4px solid #ef4444;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  color: #fecaca;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.euler-alert-warning .warning-icon-box {
+  font-size: 1.3rem;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.euler-actions-deck {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.btn-secondary-euler {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--sky-blue);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 0.65rem 1.25rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-euler:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--sky-blue);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-export-csv {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 0.65rem 1.25rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-export-csv:hover {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #34d399;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Tarjetas de Respuesta al Desafío — Pregunta 1 */
+.challenge-q1-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.q1-metric-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 6px;
+  padding: 1.15rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+}
+
+.q1-metric-card:hover {
+  border-color: var(--electric-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 229, 255, 0.15);
+}
+
+.q1-metric-card.highlight-metric {
+  border-color: rgba(255, 107, 53, 0.4);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(255, 107, 53, 0.08) 100%);
+}
+
+.q1-metric-card.highlight-metric:hover {
+  border-color: var(--mission-orange);
+  box-shadow: 0 6px 18px rgba(255, 107, 53, 0.2);
+}
+
+.q1-card-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.q1-card-value {
+  font-family: var(--font-mono);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--text-highlight);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.q1-metric-card.highlight-metric .q1-card-value {
+  color: var(--mission-orange);
+}
+
+.q1-card-unit {
+  font-size: 0.9rem;
+  color: var(--sky-blue);
+  font-weight: 400;
+}
+
+.q1-card-sub {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 0.6rem;
+}
+
+/* Nota Pedagógica Destacada */
+.pedagogical-callout-box {
+  background: linear-gradient(135deg, rgba(6, 26, 64, 0.8) 0%, rgba(13, 30, 61, 0.9) 100%);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-left: 4px solid var(--electric-blue);
+  border-radius: 6px;
+  padding: 1.35rem 1.5rem;
+}
+
+.callout-badge-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.callout-badge-header .callout-icon {
+  font-size: 1.2rem;
+}
+
+.callout-badge-header .callout-title {
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--electric-blue);
+  letter-spacing: 0.5px;
+}
+
+.callout-body-text {
+  font-size: 0.92rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.callout-body-text p {
+  margin-bottom: 0.5rem;
+}
+
+.callout-body-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Tabla Dinámica de Pasos NASA */
+.table-responsive-wrapper {
+  overflow-x: auto;
+  max-height: 480px;
+  overflow-y: auto;
+  border: 1px solid var(--border-console);
+  border-radius: 6px;
+  background: rgba(6, 14, 32, 0.75);
+}
+
+.nasa-dynamic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  text-align: left;
+}
+
+.nasa-dynamic-table thead th {
+  background: #091a38;
+  color: var(--sky-blue);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.85rem 1rem;
+  border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nasa-dynamic-table tbody td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.08);
+  font-family: var(--font-mono);
+  color: var(--text-main);
+}
+
+.nasa-dynamic-table tbody tr:hover td {
+  background: rgba(0, 229, 255, 0.06);
+  color: #fff;
+}
+
+.nasa-dynamic-table tbody tr:nth-child(even) td {
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.nasa-dynamic-table tbody tr:nth-child(even):hover td {
+  background: rgba(0, 229, 255, 0.06);
+}
+
+.nasa-dynamic-table td.col-step {
+  text-align: center;
+  color: var(--sky-blue);
+  font-weight: bold;
+}
+
+.nasa-dynamic-table td.col-numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+.flight-status-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.badge-status-launch {
+  background: rgba(255, 107, 53, 0.15);
+  color: var(--mission-orange);
+  border: 1px solid rgba(255, 107, 53, 0.4);
+}
+
+.badge-status-ascent {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--electric-blue);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+}
+
+.badge-status-terminal {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.badge-status-end {
+  background: rgba(148, 163, 184, 0.15);
+  color: #f1f5f9;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  font-weight: 600;
+}
+
+.badge-status-pad {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--mission-amber);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.euler-adaptive-step-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-left: 4px solid var(--sky-blue);
+  border-radius: 6px;
+  padding: 0.85rem 1.15rem;
+  margin-top: 1rem;
+  font-size: 0.86rem;
+  color: #e2e8f0;
+  line-height: 1.5;
+}
+
+.euler-adaptive-step-note .note-icon {
+  font-size: 1.25rem;
+  color: var(--sky-blue);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.euler-adaptive-step-note .note-content strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Procedimiento Didáctico Paso a Paso */
+.euler-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.euler-step-card {
+  background: rgba(13, 27, 56, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.euler-step-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.step-card-header {
+  background: rgba(9, 26, 56, 0.85);
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.step-card-title {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--electric-blue);
+}
+
+.step-card-interval {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--sky-blue);
+  background: rgba(56, 189, 248, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+}
+
+.step-card-body {
+  padding: 1.15rem 1.25rem;
+}
+
+.step-calcs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.step-calc-box {
+  background: rgba(6, 14, 32, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  border-radius: 4px;
+  padding: 0.85rem;
+}
+
+.step-calc-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--sky-blue);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+.step-calc-formula {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.step-calc-subst {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.step-interpretation-box {
+  background: rgba(15, 23, 42, 0.5);
+  border-left: 3px solid var(--mission-orange);
+  padding: 0.75rem 1rem;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.86rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.step-interpretation-box strong {
+  color: var(--mission-orange);
+}
+
+/* --------------------------------------------------------------------------
+   15. RESPONSIVE DESIGN (DESKTOP, TABLET, MOBILE)
    -------------------------------------------------------------------------- */
 @media (max-width: 1080px) {
   .hero-grid {

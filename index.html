@@ -801,47 +801,313 @@
   <section id="metodo-euler" class="section-wrapper">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Método de Primer Orden</span>
+        <span class="section-tag">Método de Primer Orden • Integración Numérica</span>
         <h2 class="section-title">Método de Euler Explícito</h2>
         <p class="section-subtitle">
-          Aproximación por diferencias finitas hacia adelante: integración paso a paso de la velocidad y posición.
+          Aproximación por diferencias finitas hacia adelante: cálculo paso a paso de velocidad y altitud con actualización simultánea de variables.
         </p>
       </div>
 
-      <div class="console-panel">
+      <!-- Panel 1: Fundamento Teórico y Fórmulas de Recurrencia -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
         <div class="panel-header-bar">
-          <span class="panel-title-text">FÓRMULAS DE RECURRENCIA DE EULER</span>
-          <span class="method-order-badge badge-euler">ORDEN 1 — GLOBAL O(h)</span>
+          <span class="panel-title-text">FÓRMULAS DE RECURRENCIA DE EULER (ESPACIO DE ESTADOS)</span>
+          <span class="method-order-badge badge-euler">ORDEN 1 — ERROR GLOBAL O(h)</span>
         </div>
 
         <p>
-          Dado un paso temporal $h = \Delta t$, el método de Euler actualiza el estado en el instante $t_{n+1} = t_n + h$ evaluando la aceleración y la velocidad al inicio del intervalo:
+          Dado un paso temporal discreto $h = \Delta t$, el método de Euler explícito proyecta linealmente el estado del cohete hacia el instante futuro $t_{n+1} = t_n + h$ evaluando las razones de cambio (aceleración y velocidad) exclusivamente en el punto actual $t_n$:
         </p>
 
-        <div class="equation-render">
-          $$\begin{aligned}
-            v_{n+1} &= v_n + h \left(\frac{T}{m} - g - \frac{k}{m} v_n\right) \\[8pt]
-            y_{n+1} &= y_n + h \cdot v_n
-          \end{aligned}$$
+        <div class="math-equations-container" style="margin: 1.25rem 0;">
+          <div class="equation-card">
+            <div class="equation-card-title">FÓRMULAS TEÓRICAS GENERALES</div>
+            <div class="equation-render" style="color: var(--sky-blue); font-size: 1.15rem;">
+              $$\begin{aligned}
+                v_{n+1} &= v_n + h \left(\frac{T}{m} - g - \frac{k}{m} v_n\right) \\[8pt]
+                y_{n+1} &= y_n + h \cdot v_n
+              \end{aligned}$$
+            </div>
+          </div>
+
+          <div class="equation-card">
+            <div class="equation-card-title">SUSTITUCIÓN DE LA MISIÓN ($5,19 - 0,1 v_n$)</div>
+            <div class="equation-render" style="color: var(--mission-orange); font-size: 1.15rem;">
+              $$\begin{aligned}
+                v_{n+1} &= v_n + h \cdot (5,19 - 0,1 \cdot v_n) \\[8pt]
+                y_{n+1} &= y_n + h \cdot v_n
+              \end{aligned}$$
+            </div>
+          </div>
         </div>
 
-        <p style="margin-top: 1rem; color: var(--text-muted);">
-          Sustituyendo los parámetros numéricos de nuestra misión ($5,19 - 0,1 v_n$):
-        </p>
-
-        <div class="equation-render" style="color: var(--mission-orange);">
-          $$\begin{aligned}
-            v_{n+1} &= v_n + h \cdot (5,19 - 0,1 \cdot v_n) \\[8pt]
-            y_{n+1} &= y_n + h \cdot v_n
-          \end{aligned}$$
-        </div>
-
-        <!-- Contenedor preparado para la visualización del método de Euler -->
-        <div id="euler-details-container" class="code-container-stub">
-          // Contenedor preparado: En la siguiente fase se enlazarán los resultados de numerical-methods.js (solveEuler)
-          // La interfaz presentará aquí la tabla de iteraciones con h = 2 s, 1 s, 0,5 s y 0,25 s.
+        <!-- Alerta de simultaneidad obligatoria -->
+        <div class="simultaneity-rule-box">
+          <div class="rule-icon">⚙</div>
+          <div class="rule-content">
+            <strong>REGLA FUNDAMENTAL DE SIMULTANEIDAD:</strong>
+            Las ecuaciones de posición $y_{n+1}$ y velocidad $v_{n+1}$ deben evaluarse utilizando <em>estrictamente los valores previos</em> ($y_n$, $v_n$). 
+            <strong>Nunca</strong> debe utilizarse la velocidad recién obtenida $v_{n+1}$ para calcular la altura $y_{n+1}$ del mismo paso temporal, ya que eso alteraría el algoritmo transformándolo en el método de Euler-Cromer (simpléctico).
+          </div>
         </div>
       </div>
+
+      <!-- Panel 2: Parámetros Editables del Método de Euler con Validación en Tiempo Real -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">PARÁMETROS EDITABLES DE INTEGRACIÓN</span>
+          <span class="panel-status-led"></span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Modifica cualquiera de los parámetros del modelo. La solución numérica y la tabla dinámica se recalcularán automáticamente en tiempo real respetando las restricciones de validación:
+        </p>
+
+        <!-- Grid de Inputs Editables -->
+        <div class="euler-params-deck">
+          <!-- Masa -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-m">
+              <span>Masa ($m$):</span>
+              <span id="display-euler-m" class="param-val-display">1.000 kg</span>
+            </label>
+            <input type="number" id="input-euler-m" class="param-input" value="1000" min="1" step="50">
+            <div class="field-error-msg" id="error-euler-m"></div>
+          </div>
+
+          <!-- Empuje -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-T">
+              <span>Empuje ($T$):</span>
+              <span id="display-euler-T" class="param-val-display">15.000 N</span>
+            </label>
+            <input type="number" id="input-euler-T" class="param-input" value="15000" min="0" step="500">
+            <div class="field-error-msg" id="error-euler-T"></div>
+          </div>
+
+          <!-- Gravedad -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-g">
+              <span>Gravedad ($g$):</span>
+              <span id="display-euler-g" class="param-val-display">9,81 m/s²</span>
+            </label>
+            <input type="number" id="input-euler-g" class="param-input" value="9.81" min="0" step="0.01">
+            <div class="field-error-msg" id="error-euler-g"></div>
+          </div>
+
+          <!-- Resistencia lineal -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-k">
+              <span>Resistencia lineal ($k$):</span>
+              <span id="display-euler-k" class="param-val-display">100 kg/s</span>
+            </label>
+            <input type="number" id="input-euler-k" class="param-input" value="100" min="0" step="5">
+            <div class="field-error-msg" id="error-euler-k"></div>
+          </div>
+
+          <!-- Velocidad Inicial v0 -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-v0">
+              <span>Velocidad Inicial ($v_0$):</span>
+              <span id="display-euler-v0" class="param-val-display">0,00 m/s</span>
+            </label>
+            <input type="number" id="input-euler-v0" class="param-input" value="0" step="1">
+            <div class="field-error-msg" id="error-euler-v0"></div>
+          </div>
+
+          <!-- Altura Inicial y0 -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-y0">
+              <span>Altura Inicial ($y_0$):</span>
+              <span id="display-euler-y0" class="param-val-display">0,00 m</span>
+            </label>
+            <input type="number" id="input-euler-y0" class="param-input" value="0" min="0" step="5">
+            <div class="field-error-msg" id="error-euler-y0"></div>
+          </div>
+
+          <!-- Tiempo Final tFinal -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-tFinal">
+              <span>Tiempo Final ($t_f$):</span>
+              <span id="display-euler-tFinal" class="param-val-display">20 s</span>
+            </label>
+            <input type="number" id="input-euler-tFinal" class="param-input" value="20" min="1" step="1">
+            <div class="field-error-msg" id="error-euler-tFinal"></div>
+          </div>
+
+          <!-- Paso de Integración h -->
+          <div class="euler-input-group">
+            <label class="param-input-label" for="input-euler-h">
+              <span>Paso Temporal ($h$):</span>
+              <span id="display-euler-h" class="param-val-display">2,00 s</span>
+            </label>
+            <input type="number" id="input-euler-h" class="param-input" value="2" min="0.01" step="0.25">
+            <div class="field-error-msg" id="error-euler-h"></div>
+          </div>
+        </div>
+
+        <!-- Selector rápido de pasos de integración recomendados -->
+        <div class="quick-step-bar" style="margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim);">PASO RÁPIDO:</span>
+          <button type="button" class="step-selector-btn active" data-h="2">h = 2 s (Base)</button>
+          <button type="button" class="step-selector-btn" data-h="1">h = 1 s</button>
+          <button type="button" class="step-selector-btn" data-h="0.5">h = 0,5 s</button>
+          <button type="button" class="step-selector-btn" data-h="0.25">h = 0,25 s</button>
+        </div>
+
+        <!-- Banner de Advertencia de No Despegue (T < mg) -->
+        <div id="euler-liftoff-warning" class="euler-alert-warning" style="display: none; margin-top: 1.25rem;">
+          <div class="warning-icon-box">⚠</div>
+          <div class="warning-text">
+            <strong>ADVERTENCIA DE CONDICIÓN DE VUELO:</strong> El empuje de los motores ($T$) es insuficiente para vencer el peso gravitacional ($mg$). El cohete no tiene empuje neto para despegar de la plataforma. La aceleración vertical se anula en la torre y la altitud permanece acotada a $y \ge 0\text{ m}$.
+          </div>
+        </div>
+
+        <!-- Botonera de Acción de Euler -->
+        <div class="euler-actions-deck" style="margin-top: 1.5rem;">
+          <button type="button" id="btn-euler-calculate" class="btn-ctrl btn-launch">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Calcular
+          </button>
+          <button type="button" id="btn-euler-reset" class="btn-ctrl btn-reset">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 6px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reiniciar
+          </button>
+          <button type="button" id="btn-euler-toggle-steps" class="btn-ctrl btn-secondary-euler">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Mostrar Procedimiento
+          </button>
+          <button type="button" id="btn-euler-download-csv" class="btn-ctrl btn-export-csv">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel 3: Tarjetas de Respuesta al Desafío — Pregunta 1 -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">RESPUESTA AL DESAFÍO — PREGUNTA 1: VELOCIDADES CLAVE Y ALTITUD (EULER)</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--electric-blue);">EVALUACIÓN FORMAL</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Puntos críticos solicitados en el planteamiento de la misión, calculados paso a paso con el método de Euler:
+        </p>
+
+        <div class="challenge-q1-grid">
+          <!-- Tarjeta v(2 s) -->
+          <div class="q1-metric-card">
+            <div class="q1-card-label">Velocidad a t = 2 s</div>
+            <div class="q1-card-value" id="q1-val-v2">10,3800 <span class="q1-card-unit">m/s</span></div>
+            <div class="q1-card-sub" id="q1-sub-v2">Paso n = 1 (v₁ = 0 + 2 · 5,19)</div>
+          </div>
+
+          <!-- Tarjeta v(4 s) -->
+          <div class="q1-metric-card">
+            <div class="q1-card-label">Velocidad a t = 4 s</div>
+            <div class="q1-card-value" id="q1-val-v4">18,6840 <span class="q1-card-unit">m/s</span></div>
+            <div class="q1-card-sub" id="q1-sub-v4">Paso n = 2 (v₂ = 10,38 + 2 · 4,152)</div>
+          </div>
+
+          <!-- Tarjeta v(10 s) -->
+          <div class="q1-metric-card">
+            <div class="q1-card-label">Velocidad a t = 10 s</div>
+            <div class="q1-card-value" id="q1-val-v10">34,8934 <span class="q1-card-unit">m/s</span></div>
+            <div class="q1-card-sub" id="q1-sub-v10">Paso n = 5 (Régimen intermedio)</div>
+          </div>
+
+          <!-- Tarjeta v(20 s) -->
+          <div class="q1-metric-card highlight-metric">
+            <div class="q1-card-label">Velocidad Final a t = 20 s</div>
+            <div class="q1-card-value" id="q1-val-v20">46,3273 <span class="q1-card-unit">m/s</span></div>
+            <div class="q1-card-sub" id="q1-sub-v20">Paso n = 10 (Aceleración reducida)</div>
+          </div>
+
+          <!-- Tarjeta y(20 s) -->
+          <div class="q1-metric-card highlight-metric">
+            <div class="q1-card-label">Altitud Final a t = 20 s</div>
+            <div class="q1-card-value" id="q1-val-y20">574,7272 <span class="q1-card-unit">m</span></div>
+            <div class="q1-card-sub" id="q1-sub-y20">Pregunta 2: Altura alcanzada</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Nota Didáctica Destacada (¿Por qué y(2 s) = 0 m?) -->
+      <div class="pedagogical-callout-box" style="margin-bottom: 2rem;">
+        <div class="callout-badge-header">
+          <span class="callout-icon">📌</span>
+          <span class="callout-title">NOTA DIDÁCTICA FUNDAMENTAL: ¿POR QUÉ LA ALTURA EN t = 2 s RESULTA 0 m EN EULER?</span>
+        </div>
+        <div class="callout-body-text">
+          <p>
+            Al observar la tabla de integración, resulta llamativo que para $t = 2\text{ s}$ la altitud continúe siendo exactamente $y = 0\text{ m}$, a pesar de que el motor ha estado encendido y la velocidad ha crecido hasta $v = 10,38\text{ m/s}$.
+          </p>
+          <p style="margin-top: 0.75rem;">
+            La razón matemática estriba en la fórmula de actualización de posición del método de Euler explícito:
+          </p>
+          <div class="equation-render" style="color: var(--electric-blue); font-size: 1.15rem; margin: 0.75rem 0;">
+            $$y_1 = y_0 + h \cdot v_0 = 0 + (2\text{ s}) \cdot (0\text{ m/s}) = 0\text{ m}$$
+          </div>
+          <p>
+            Euler asume que la velocidad al inicio del intervalo ($v_0 = 0\text{ m/s}$) se mantiene <em>constante e invariable</em> durante todo el intervalo de $2\text{ segundos}$. Por tanto, <strong>no es que el cohete esté detenido físicamente</strong> durante los dos primeros segundos, sino que se trata de un <strong>error de discretización por truncamiento</strong> intrínseco a la naturaleza del algoritmo de primer orden con un paso temporal grande ($h = 2\text{ s}$). En la solución analítica exacta, el cohete ya se encuentra a una altura real de $9,72\text{ m}$ a los 2 segundos. Al reducir el paso $h$ a $1\text{ s}$, $0,5\text{ s}$ o $0,25\text{ s}$, este error decrece de manera notable.
+          </p>
+        </div>
+      </div>
+
+      <!-- Panel 5: Tabla Dinámica de Pasos de Euler -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">TABLA DINÁMICA DE INTEGRACIÓN PASO A PASO (MÉTODO DE EULER)</span>
+          <span id="euler-table-step-info" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">
+            TOTAL PASOS: 10 (h = 2,00 s)
+          </span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Registro secuencial completo de la trayectoria vertical. Todos los valores numéricos se presentan con formato en coma decimal:
+        </p>
+
+        <div class="table-responsive-wrapper">
+          <table class="nasa-dynamic-table" id="euler-dynamic-table">
+            <thead>
+              <tr>
+                <th style="width: 70px; text-align: center;">n</th>
+                <th>Tiempo (s)</th>
+                <th>Velocidad (m/s)</th>
+                <th>Altura (m)</th>
+                <th>Aceleración (m/s²)</th>
+                <th style="text-align: right;">Estado de Vuelo</th>
+              </tr>
+            </thead>
+            <tbody id="euler-table-body">
+              <!-- Inyectado dinámicamente por app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Nota visible bajo la tabla cuando tFinal no es múltiplo de h -->
+        <div id="euler-adaptive-step-note" class="euler-adaptive-step-note" style="display: none;">
+          <div class="note-icon">ℹ</div>
+          <div class="note-content" id="euler-adaptive-step-content">
+            <!-- Inyectado dinámicamente por app.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 6: Sección Didáctica del Procedimiento Paso a Paso (Colapsable / Desplegable) -->
+      <div class="console-panel" id="euler-procedure-panel">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">DESGLOSE DIDÁCTICO DEL PROCEDIMIENTO PASO A PASO</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--mission-amber);">DETALLE ALGEBRAICO Y FÍSICO</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Para cada paso de integración $n \to n+1$, se detalla la fórmula matemática aplicada, la sustitución numérica de las variables con los datos de vuelo, el resultado obtenido y la correspondiente interpretación física del comportamiento del vehículo:
+        </p>
+
+        <!-- Contenedor dinámico de pasos didácticos -->
+        <div id="euler-steps-container" class="euler-steps-list">
+          <!-- Inyectado dinámicamente por app.js -->
+        </div>
+      </div>
+
     </div>
   </section>
 
