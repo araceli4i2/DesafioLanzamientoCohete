@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NASA MISSION 1962 — Suite de Pruebas Automatizadas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      background: #030712;
+      color: #f8fafc;
+      padding: 2rem 1rem;
+      font-family: var(--font-sans);
+    }
+    .test-suite-container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .test-header {
+      background: linear-gradient(135deg, rgba(6, 14, 32, 0.95), rgba(14, 165, 233, 0.15));
+      border: 1px solid var(--border-console-bright);
+      border-radius: var(--radius-md);
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.8);
+    }
+    .test-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .test-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--text-highlight);
+      margin: 0;
+    }
+    .test-metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+    .test-stat-card {
+      background: rgba(6, 14, 32, 0.8);
+      border: 1px solid var(--border-console);
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      text-align: center;
+    }
+    .test-stat-val {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+    .test-stat-val.green { color: #10B981; }
+    .test-stat-val.red { color: #EF4444; }
+    .test-stat-val.cyan { color: #00E5FF; }
+    .test-stat-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .test-section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-console);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .test-section-title {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--sky-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .test-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .test-table th {
+      background: rgba(6, 14, 32, 0.9);
+      border: 1px solid var(--border-console);
+      padding: 0.65rem 0.85rem;
+      color: var(--sky-blue);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+    .test-table td {
+      border: 1px solid rgba(56, 189, 248, 0.12);
+      padding: 0.65rem 0.85rem;
+    }
+    .badge-pass {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10B981;
+      color: #10B981;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+    }
+    .badge-fail {
+      display: inline-block;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #EF4444;
+      color: #EF4444;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 3px;
+    }
+    .test-details-text {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+    .nav-back-link {
+      display: inline-flex;
+      align-items: center;
+      color: var(--sky-blue);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      transition: color 0.2s ease;
+    }
+    .nav-back-link:hover {
+      color: var(--electric-blue);
+    }
+  </style>
+</head>
+<body>
+  <div class="test-suite-container">
+    <a href="index.html" class="nav-back-link">
+      ← Volver al Simulador Principal (index.html)
+    </a>
+
+    <header class="test-header">
+      <div class="test-header-top">
+        <div>
+          <span class="badge-mission-nasa" style="margin-bottom: 0.4rem;">NASA MISSION 1962</span>
+          <h1 class="test-title">Suite de Pruebas Automatizadas y Auditoría</h1>
+        </div>
+        <button type="button" id="btn-rerun-tests" class="btn-ctrl btn-launch" style="padding: 0.6rem 1.2rem;">
+          RE-EJECUTAR PRUEBAS
+        </button>
+      </div>
+      <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin: 0;">
+        Verificación matemática y numérica rigurosa: modelo EDO, Euler con regla de simultaneidad, solución analítica continua, métodos Heun y RK4, casos frontera y convergencia de primer orden.
+      </p>
+
+      <div class="test-metrics-bar">
+        <div class="test-stat-card">
+          <div id="stat-total" class="test-stat-val cyan">0</div>
+          <div class="test-stat-lbl">Pruebas Evaluadas</div>
+        </div>
+        <div class="test-stat-card">
+          <div id="stat-passed" class="test-stat-val green">0</div>
+          <div class="test-stat-lbl">Pruebas Superadas</div>
+        </div>
+        <div class="test-stat-card">
+          <div id="stat-failed" class="test-stat-val red">0</div>
+          <div class="test-stat-lbl">Pruebas Falladas</div>
+        </div>
+      </div>
+    </header>
+
+    <div id="test-results-container"></div>
+  </div>
+
+  <!-- Scripts matemáticos y numéricos -->
+  <script src="js/mathematics.js"></script>
+  <script src="js/numerical-methods.js"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const DEFAULT_PARAMS = {
+        m: 1000.0,
+        T: 15000.0,
+        g: 9.81,
+        k: 100.0,
+        v0: 0.0,
+        y0: 0.0,
+        tFinal: 20.0,
+        h: 2.0
+      };
+
+      function runAllTests() {
+        const sections = [
+          { title: '1. Modelo Matemático y Leyes Físicas', tests: [] },
+          { title: '2. Método de Euler Explícito (h = 2 s, t = 20 s)', tests: [] },
+          { title: '3. Solución Analítica Exacta', tests: [] },
+          { title: '4. Tabla de Convergencia de Euler (h = 2, 1, 0,5, 0,25)', tests: [] },
+          { title: '5. Métodos de Orden Superior: Heun y RK4', tests: [] },
+          { title: '6. Manejo de Errores y Casos Frontera', tests: [] }
+        ];
+
+        let totalPassed = 0;
+        let totalFailed = 0;
+
+        function record(secIdx, name, isPass, details) {
+          if (isPass) totalPassed++;
+          else totalFailed++;
+          sections[secIdx].tests.push({ name, isPass, details });
+        }
+
+        // --- 1. MODELO MATEMÁTICO ---
+        const a0 = window.Mathematics.calculateAcceleration(1000, 15000, 9.81, 100, 0);
+        record(0, 'Aceleración inicial a(0) = 5,19 m/s²', Math.abs(a0 - 5.19) < 1e-10, `Calculado: ${a0} m/s²`);
+
+        const fNet10 = window.Mathematics.calculateNetForce(1000, 15000, 9.81, 100, 10);
+        record(0, 'Fuerza neta ΣF(v=10) = 4.190 N', Math.abs(fNet10 - 4190) < 1e-10, `Calculado: ${fNet10} N`);
+
+        const vTerm = window.Mathematics.calculateTerminalVelocity(1000, 15000, 9.81, 100);
+        record(0, 'Velocidad terminal v_inf = 51,9 m/s', Math.abs(vTerm - 51.9) < 1e-10, `Calculado: ${vTerm} m/s`);
+
+        // --- 2. EULER ---
+        const euler = window.NumericalMethods.solveEuler(DEFAULT_PARAMS);
+        const eEnd = euler[euler.length - 1];
+
+        record(1, 'Euler v(20) = 46,32727993344 m/s', Math.abs(eEnd.v - 46.32727993344) < 1e-8,
+          `Calculado: ${eEnd.v.toFixed(11)} | Esperado: 46.32727993344`);
+
+        record(1, 'Euler y(20) = 574,7272006656 m', Math.abs(eEnd.y - 574.7272006656) < 1e-8,
+          `Calculado: ${eEnd.y.toFixed(10)} | Esperado: 574.7272006656`);
+
+        record(1, 'Euler Iteración 1: v(2) = 10,38 m/s', Math.abs(euler[1].v - 10.38) < 1e-10, `Calculado: ${euler[1].v}`);
+        record(1, 'Euler Iteración 2: v(4) = 18,684 m/s', Math.abs(euler[2].v - 18.684) < 1e-10, `Calculado: ${euler[2].v}`);
+        record(1, 'Euler Iteración 3: v(6) = 25,3272 m/s', Math.abs(euler[3].v - 25.3272) < 1e-10, `Calculado: ${euler[3].v}`);
+
+        record(1, 'Euler Iteración 1: y(2) = 0,00 m (Simultaneidad)', Math.abs(euler[1].y - 0.0) < 1e-10, `Calculado: ${euler[1].y}`);
+        record(1, 'Euler Iteración 2: y(4) = 20,76 m', Math.abs(euler[2].y - 20.76) < 1e-10, `Calculado: ${euler[2].y}`);
+        record(1, 'Euler Iteración 3: y(6) = 58,128 m', Math.abs(euler[3].y - 58.128) < 1e-10, `Calculado: ${euler[3].y}`);
+
+        // --- 3. EXACTA ---
+        const vEx20 = window.Mathematics.velocidadExacta(20, DEFAULT_PARAMS);
+        const yEx20 = window.Mathematics.alturaExacta(20, DEFAULT_PARAMS);
+        record(2, 'Analítica v(20) ≈ 44,8761 m/s', Math.abs(vEx20 - 44.8760988) < 1e-4, `Calculado: ${vEx20.toFixed(4)}`);
+        record(2, 'Analítica y(20) ≈ 589,2390 m', Math.abs(yEx20 - 589.239012) < 1e-4, `Calculado: ${yEx20.toFixed(4)}`);
+
+        // --- 4. CONVERGENCIA ---
+        const convExpected = [
+          { h: 2.0, ev: 46.3273, eeV: 1.4512, ey: 574.7272, eeY: 14.5118 },
+          { h: 1.0, ev: 45.5902, eeV: 0.7141, ey: 582.0983, eeY: 7.1407 },
+          { h: 0.5, ev: 45.2302, eeV: 0.3541, ey: 585.6978, eeY: 3.5412 },
+          { h: 0.25, ev: 45.0524, eeV: 0.1763, ey: 587.4757, eeY: 1.7633 }
+        ];
+
+        convExpected.forEach((c) => {
+          const sc = window.NumericalMethods.solveEuler(Object.assign({}, DEFAULT_PARAMS, { h: c.h }));
+          const end = sc[sc.length - 1];
+          const errV = Math.abs(vEx20 - end.v);
+          const errY = Math.abs(yEx20 - end.y);
+          const ok = Math.abs(end.v - c.ev) < 0.001 && Math.abs(errV - c.eeV) < 0.001;
+          record(3, `Convergencia h = ${c.h} s: v=${end.v.toFixed(4)} (err ${errV.toFixed(4)}), y=${end.y.toFixed(4)} (err ${errY.toFixed(4)})`,
+            ok, `Esperado: v=${c.ev}, errV=${c.eeV}, y=${c.ey}, errY=${c.eeY}`);
+        });
+
+        const sH2 = window.NumericalMethods.solveEuler(Object.assign({}, DEFAULT_PARAMS, { h: 2.0 }));
+        const sH1 = window.NumericalMethods.solveEuler(Object.assign({}, DEFAULT_PARAMS, { h: 1.0 }));
+        const ratio = Math.abs(vEx20 - sH1[sH1.length - 1].v) / Math.abs(vEx20 - sH2[sH2.length - 1].v);
+        record(3, 'Reducción de error a la mitad al dividir h entre 2 (Orden lineal O(h))',
+          ratio > 0.48 && ratio < 0.52, `Cociente: ${ratio.toFixed(4)} (reducción del ${(100 - ratio*100).toFixed(1)}%)`);
+
+        // --- 5. HEUN Y RK4 ---
+        const heun = window.NumericalMethods.solveHeun(DEFAULT_PARAMS);
+        const rk4 = window.NumericalMethods.solveRK4(DEFAULT_PARAMS);
+
+        record(4, 'Heun en t=2 s: v(2) = 9,3420 m/s', Math.abs(heun[1].v - 9.342) < 1e-4, `Calculado: ${heun[1].v.toFixed(4)}`);
+        record(4, 'Heun en t=2 s: y(2) = 10,3800 m', Math.abs(heun[1].y - 10.38) < 1e-4, `Calculado: ${heun[1].y.toFixed(4)}`);
+        record(4, 'RK4 en t=2 s: v(2) ≈ 9,4076 m/s', Math.abs(rk4[1].v - 9.4076) < 0.001, `Calculado: ${rk4[1].v.toFixed(4)}`);
+        const rk4Err = Math.abs(vEx20 - rk4[rk4.length - 1].v);
+        record(4, 'RK4 error final < 0,003 m/s frente a la exacta', rk4Err < 0.003, `Error RK4: ${rk4Err.toFixed(6)} m/s`);
+
+        // --- 6. CASOS FRONTERA ---
+        const pK0 = Object.assign({}, DEFAULT_PARAMS, { k: 0 });
+        const vK0 = window.Mathematics.velocidadExacta(20, pK0);
+        const yK0 = window.Mathematics.alturaExacta(20, pK0);
+        record(5, 'Caso frontera k = 0: velocidadExacta(20) = 103,8 m/s', Math.abs(vK0 - 103.8) < 1e-8, `Calculado: ${vK0}`);
+        record(5, 'Caso frontera k = 0: alturaExacta(20) = 1038,0 m', Math.abs(yK0 - 1038) < 1e-8, `Calculado: ${yK0}`);
+
+        const pLowT = Object.assign({}, DEFAULT_PARAMS, { T: 5000 });
+        const yLowT = window.Mathematics.alturaExacta(20, pLowT);
+        const vLowT = window.Mathematics.velocidadExacta(20, pLowT);
+        record(5, 'Caso plataforma T = 5000 N: y = 0, v = 0 en solución exacta', yLowT === 0 && vLowT === 0, `y=${yLowT}, v=${vLowT}`);
+
+        const eulerLow = window.NumericalMethods.solveEuler(pLowT);
+        const eLowEnd = eulerLow[eulerLow.length - 1];
+        record(5, 'Euler con T = 5000 N: y = 0, v = 0 sobre el pad', eLowEnd.y === 0 && eLowEnd.v === 0, `y=${eLowEnd.y}, v=${eLowEnd.v}`);
+
+        const pNonMult = Object.assign({}, DEFAULT_PARAMS, { h: 3.0, tFinal: 20.0 });
+        const sNonMult = window.NumericalMethods.solveEuler(pNonMult);
+        const endNonMult = sNonMult[sNonMult.length - 1];
+        record(5, 'Paso no múltiplo h = 3 s con tFinal = 20 s: termina exactamente en t = 20 s',
+          Math.abs(endNonMult.t - 20) < 1e-8 && endNonMult.isLastStepAdjusted === true, `t = ${endNonMult.t} s, dt final = ${endNonMult.h} s`);
+
+        // Renderizar en UI
+        document.getElementById('stat-total').textContent = totalPassed + totalFailed;
+        document.getElementById('stat-passed').textContent = totalPassed;
+        document.getElementById('stat-failed').textContent = totalFailed;
+
+        let html = '';
+        sections.forEach((sec) => {
+          html += `
+            <section class="test-section-card">
+              <h2 class="test-section-title">
+                <span class="status-dot-green"></span>
+                ${sec.title}
+              </h2>
+              <div class="table-responsive-wrapper">
+                <table class="test-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 100px; text-align: center;">Estado</th>
+                      <th>Descripción de la Prueba</th>
+                      <th>Detalles de Ejecución</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+          `;
+          sec.tests.forEach((t) => {
+            const badge = t.isPass
+              ? '<span class="badge-pass">✔ PASS</span>'
+              : '<span class="badge-fail">✘ FAIL</span>';
+            html += `
+              <tr>
+                <td style="text-align: center;">${badge}</td>
+                <td><strong>${t.name}</strong></td>
+                <td><span class="test-details-text">${t.details || ''}</span></td>
+              </tr>
+            `;
+          });
+          html += '</tbody></table></div></section>';
+        });
+
+        document.getElementById('test-results-container').innerHTML = html;
+      }
+
+      document.getElementById('btn-rerun-tests').addEventListener('click', runAllTests);
+      runAllTests();
+    })();
+  </script>
+</body>
+</html>
+
