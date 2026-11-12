@@ -217,43 +217,94 @@
        ======================================================================= -->
   <section id="contexto-historico" class="section-wrapper">
     <div class="container">
+
+      <!-- Indicador de etapas completadas del proyecto pedagógico -->
+      <div class="stage-tracker-bar">
+        <span class="stage-tracker-label">ETAPAS DEL DESAFÍO:</span>
+        <div class="stage-chips-list">
+          <span class="stage-chip active">● Etapa 1: Contexto & Misión</span>
+          <span class="stage-chip">○ Etapa 2: Planteamiento Físico</span>
+          <span class="stage-chip">○ Etapa 3: Modelo Matemático</span>
+          <span class="stage-chip">○ Etapa 4: Métodos Numéricos</span>
+          <span class="stage-chip">○ Etapa 5: Simulación & Evaluación</span>
+        </div>
+      </div>
+
+      <!-- Encabezado de la Sección -->
       <div class="section-header">
         <span class="section-tag">Expediente Histórico 1962</span>
-        <h2 class="section-title">Katherine Johnson, John Glenn y la Era Mercury</h2>
+        <h2 class="section-title">La Carrera Espacial y el Legado de las Calculistas</h2>
         <p class="section-subtitle">
-          El 20 de febrero de 1962, John Glenn se convirtió en el primer estadounidense en orbitar la Tierra a bordo de la cápsula Friendship 7. Detrás del éxito estuvo el rigor matemático de las mujeres calculistas de la NASA.
+          De la Guerra Fría al Proyecto Mercury: cómo la matemática aplicada, las computadoras humanas de Langley y la computación electrónica forjaron los cimientos de la exploración cósmica.
         </p>
       </div>
 
+      <!-- Narrativa del estudiante: Rol de Matemático de Control de Misión -->
+      <div class="student-role-card">
+        <div class="student-role-header">
+          <span class="student-role-badge">COMUNICADO OFICIAL DE MISIÓN • CAPE CANAVERAL 1962</span>
+          <span class="panel-status-led"></span>
+        </div>
+        <div class="student-role-quote">
+          "NASA necesita calcular la trayectoria de un cohete experimental. Tu trabajo consiste en desarrollar un modelo matemático, resolverlo mediante métodos numéricos y verificar la precisión de los resultados antes de evaluar el lanzamiento."
+        </div>
+        <div class="student-role-caption">
+          Asignación: Matemático de vuelo • División de Mecánica y Trayectorias Espaciales • Puesto de verificación y análisis analítico.
+        </div>
+      </div>
+
+      <!-- Ficha de la misión ficticia de reconstrucción didáctica -->
+      <div class="mission-dossier-card">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">FICHA TÉCNICA DE LA MISIÓN DIDÁCTICA (COHETE EXP-1962)</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--mission-orange);">RECONSTRUCCIÓN EXPERIMENTAL</span>
+        </div>
+        <div class="dossier-grid">
+          <div class="dossier-field">
+            <span class="dossier-label">Misión / Programa</span>
+            <span class="dossier-value">Vuelo Experimental Mercury-Sim 1962</span>
+          </div>
+          <div class="dossier-field">
+            <span class="dossier-label">Masa Inicial del Vehículo</span>
+            <span class="dossier-value">1.000 kg</span>
+          </div>
+          <div class="dossier-field">
+            <span class="dossier-label">Empuje Continuo del Motor</span>
+            <span class="dossier-value">15.000 N</span>
+          </div>
+          <div class="dossier-field">
+            <span class="dossier-label">Aceleración Gravitatoria</span>
+            <span class="dossier-value">9,81 m/s² (Nivel del mar)</span>
+          </div>
+          <div class="dossier-field">
+            <span class="dossier-label">Modelo de Resistencia</span>
+            <span class="dossier-value">Lineal (k = 100 kg/s)</span>
+          </div>
+          <div class="dossier-field">
+            <span class="dossier-label">Horizonte de Simulación</span>
+            <span class="dossier-value">t_final = 20 s (Paso base h = 2 s)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjetas informativas con contexto histórico profundo -->
       <div class="history-cards-grid">
-        <!-- Tarjeta 1: Katherine Johnson y el grupo de calculistas -->
+
+        <!-- Tarjeta 1: La Carrera Espacial -->
         <article class="history-card">
-          <div class="history-image-container">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Katherine_Johnson_at_NASA%2C_in_1966.jpg" 
-                 alt="Katherine Johnson en su mesa de trabajo en la NASA (1966)" 
-                 loading="lazy">
-          </div>
-          <div class="image-attribution-caption">
-            <strong>Título:</strong> Katherine Johnson at NASA (1966).<br>
-            <strong>Autor:</strong> NASA (Dominio Público).<br>
-            <strong>Fuente:</strong> <a href="https://commons.wikimedia.org/wiki/File:Katherine_Johnson_at_NASA,_in_1966.jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons / NASA</a>
-          </div>
           <div class="history-content">
-            <h3 class="history-card-title">Las Calculadoras Humanas del West Area</h3>
+            <span class="section-tag" style="margin-bottom: 0.5rem;">Geopolítica & Ciencia</span>
+            <h3 class="history-card-title">La Carrera Espacial: EE. UU. vs. la Unión Soviética</h3>
             <p>
-              Antes de que las computadoras electrónicas fueran confiables, los cálculos de trayectoria, ventanas de lanzamiento y maniobras de reentrada atmosférica eran resueltos manualmente por mujeres afroamericanas como <strong>Katherine Johnson</strong>, <strong>Dorothy Vaughan</strong> y <strong>Mary Jackson</strong>.
+              Tras el fin de la Segunda Guerra Mundial, Estados Unidos y la Unión Soviética entraron en una intensa pugna ideológica y tecnológica. En 1957, la URSS sorprendió al mundo con el lanzamiento del <strong>Sputnik 1</strong>, el primer satélite artificial, seguido en abril de 1961 por el histórico vuelo de <strong>Yuri Gagarin</strong> a bordo de la Vostok 1.
             </p>
-            <div class="quote-box">
-              "Si ella dice que los números están bien, entonces estoy listo para ir."
-              <br><small style="color: var(--sky-blue); font-family: var(--font-mono);">— John Glenn a los ingenieros de vuelo antes de abordar la Friendship 7</small>
-            </div>
             <p>
-              Glenn desconfiaba de la flamante computadora electrónica IBM 7090 y solicitó expresamente que Katherine Johnson verificara a mano las ecuaciones orbitales y los puntos de cálculo numérico antes del lanzamiento.
+              Para los Estados Unidos, recuperar el liderazgo científico se convirtió en una cuestión de máxima prioridad nacional. El presidente John F. Kennedy impulsó el <strong>Proyecto Mercury</strong> con la meta urgente de poner a un ser humano en órbita y regresarlo sano y salvo a la Tierra.
             </p>
           </div>
         </article>
 
-        <!-- Tarjeta 2: Sala de Control Mercury -->
+        <!-- Tarjeta 2: Mercury y Friendship 7 -->
         <article class="history-card">
           <div class="history-image-container">
             <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Mercury_Control_Center_during_Mercury-Atlas_6_mission_1962.jpg" 
@@ -262,25 +313,170 @@
           </div>
           <div class="image-attribution-caption">
             <strong>Título:</strong> Mercury Control Center during Mercury-Atlas 6 mission (1962).<br>
-            <strong>Autor:</strong> NASA (Dominio Público).<br>
+            <strong>Autor:</strong> NASA.<br>
+            <strong>Licencia:</strong> Dominio Público (NASA).<br>
             <strong>Fuente:</strong> <a href="https://commons.wikimedia.org/wiki/File:Mercury_Control_Center_during_Mercury-Atlas_6_mission_1962.jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons / NASA</a>
           </div>
           <div class="history-content">
-            <h3 class="history-card-title">La Transición hacia los Métodos Numéricos</h3>
+            <span class="section-tag" style="margin-bottom: 0.5rem;">20 de Febrero de 1962</span>
+            <h3 class="history-card-title">El Vuelo de John Glenn (Friendship 7)</h3>
             <p>
-              El cálculo de la aceleración, velocidad y resistencia aerodinámica de un cohete propulsado requiere resolver ecuaciones diferenciales ordinarias mediante algoritmos paso a paso:
+              A bordo de la cápsula <em>Friendship 7</em> impulsada por un cohete Atlas, el astronauta <strong>John Glenn</strong> completó tres órbitas completas alrededor de la Tierra, alcanzando velocidades superiores a los 28.000 km/h.
             </p>
-            <ul style="margin-left: 1.25rem; color: var(--text-muted); margin-bottom: 1rem;">
-              <li>División del tiempo de ascenso en intervalos discretos $h = \Delta t$.</li>
-              <li>Actualización de la fuerza de empuje constante y el peso gravitacional.</li>
-              <li>Ajuste continuo por la resistencia aerodinámica lineal $k \cdot v$.</li>
-            </ul>
             <p>
-              Una pequeña discrepancia en el paso de integración acumulaba errores considerables en la altitud final y en el punto de intercepción orbital.
+              El margen de error era nulo: un ángulo de reentrada atmosférica demasiado pronunciado incineraría la nave por calor de fricción; uno demasiado suave la haría rebotar en la atmósfera hacia el espacio exterior. La vida del astronauta dependía directamente de la exactitud milimétrica de las ecuaciones de trayectoria.
             </p>
           </div>
         </article>
+
+        <!-- Tarjeta 3: Katherine Johnson y las Calculistas de West Area -->
+        <article class="history-card">
+          <div class="history-image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Katherine_Johnson_at_NASA%2C_in_1966.jpg" 
+                 alt="Katherine Johnson en su mesa de cálculo en la NASA (1966)" 
+                 loading="lazy">
+          </div>
+          <div class="image-attribution-caption">
+            <strong>Título:</strong> Katherine Johnson at NASA (1966).<br>
+            <strong>Autor:</strong> NASA.<br>
+            <strong>Licencia:</strong> Dominio Público (NASA).<br>
+            <strong>Fuente:</strong> <a href="https://commons.wikimedia.org/wiki/File:Katherine_Johnson_at_NASA,_in_1966.jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons / NASA</a>
+          </div>
+          <div class="history-content">
+            <span class="section-tag" style="margin-bottom: 0.5rem;">Computación Humana</span>
+            <h3 class="history-card-title">Katherine Johnson, Dorothy Vaughan y Mary Jackson</h3>
+            <p>
+              En el Centro de Investigación de Langley (Virginia), un grupo extraordinario de mujeres matemáticas afroamericanas, conocidas como las <em>"Computadoras Humanas"</em> de la sección <strong>West Area Computing</strong>, realizaban los cálculos más complejos a mano y con reglas de cálculo.
+            </p>
+            <div class="quote-box">
+              "Llama a la chica para que revise los números... Si ella dice que están bien, entonces estoy listo para ir."
+              <br><small style="color: var(--sky-blue); font-family: var(--font-mono);">— John Glenn antes de autorizar el despegue de la Friendship 7</small>
+            </div>
+            <p>
+              <strong>Dorothy Vaughan</strong> se convirtió en la primera supervisora afroamericana de la NACA y lideró la transición hacia el lenguaje de programación FORTRAN. <strong>Mary Jackson</strong> fue la primera mujer ingeniera afroamericana de la NASA, especializada en túneles de viento supersónicos. <strong>Katherine Johnson</strong> calculó las trayectorias de vuelo suborbital de Alan Shepard, la órbita de Glenn y la cita lunar de la misión Apolo 11.
+            </p>
+          </div>
+        </article>
+
+        <!-- Tarjeta 4: Matemáticas, EDOs y Métodos Numéricos -->
+        <article class="history-card">
+          <div class="history-content">
+            <span class="section-tag" style="margin-bottom: 0.5rem;">Fundamentos Matemáticos</span>
+            <h3 class="history-card-title">Matemáticas, Ecuaciones Diferenciales y Métodos Numéricos</h3>
+            <p>
+              El movimiento de un cohete se rige por la <strong>Segunda Ley de Newton</strong>: la fuerza resultante equivale a la tasa de cambio del momento lineal ($F = \frac{dp}{dt}$). Al considerar masa variable, gravedad terrestre y resistencia atmosférica que cambia con la altitud y la velocidad, el fenómeno se describe mediante un <strong>sistema de ecuaciones diferenciales ordinarias (EDO)</strong> acopladas.
+            </p>
+            <p>
+              En ingeniería aeroespacial real, la gran mayoría de estas ecuaciones <em>carecen de solución analítica exacta en forma cerrada</em>. La única vía para conocer la altitud y velocidad en cada segundo es aproximar la solución mediante <strong>métodos numéricos de discretización temporal</strong>.
+            </p>
+          </div>
+        </article>
+
+        <!-- Tarjeta 5: Cine vs. Historia Real (Talentos Ocultos y el Método de Euler) -->
+        <article class="history-card card-full-width">
+          <div class="history-content">
+            <div class="panel-header-bar" style="margin-bottom: 0.75rem;">
+              <span class="panel-title-text" style="color: var(--mission-orange);">
+                CINEMATOGRAFÍA VS. RIGOR HISTÓRICO: «TALENTOS OCULTOS» Y EL MÉTODO DE EULER
+              </span>
+              <span class="panel-status-led" style="background: var(--sky-blue); box-shadow: 0 0 8px var(--sky-blue);"></span>
+            </div>
+            <p>
+              En la galardonada película <em>Talentos Ocultos (Hidden Figures, 2016)</em>, basada en el libro de Margot Lee Shetterly, se inmortaliza la escena en que Katherine Johnson propone resolver la trayectoria de reentrada exclamando: <em>"El método de Euler. Es antiguo, sí, pero funciona"</em>.
+            </p>
+            <div class="quote-box" style="border-left-color: var(--mission-orange);">
+              <strong>Distinción Fundamental entre Realidad Histórica y Simulación Ficticia:</strong>
+              <br>
+              En la misión histórica real de 1962, los ingenieros de la NASA y las calculistas <strong>no utilizaron el método de Euler como algoritmo final de navegación</strong>. El método de Euler (formulado por Leonhard Euler en 1768) posee un error de truncamiento local $O(h^2)$ y un error global acumulado de primer orden $O(h)$, el cual diverge con rapidez y habría generado desvíos de decenas de kilómetros en la trayectoria real. En la práctica orbital se utilizaron métodos numéricos de orden superior: Runge-Kutta de cuarto orden (RK4), algoritmos multipaso Predictor-Corrector de Adams-Bashforth/Moulton y formulaciones clásicas de mecánica celeste como los métodos de perturbación de Cowell y Encke.
+            </p>
+            <p>
+              La referencia a Euler en la película cumple una <strong>maravillosa función dramática y divulgativa</strong>. En este simulador adoptamos esa misma inspiración pedagógica: abordamos primero el <em>Método de Euler</em> como modelo didáctico de partida para comprender los fundamentos de la discretización temporal, antes de compararlo críticamente frente a métodos más robustos como <em>Heun</em> y <em>Runge-Kutta 4</em>.
+            </p>
+          </div>
+        </article>
+
       </div>
+
+      <!-- Línea temporal de hitos históricos -->
+      <div class="timeline-panel">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">CRONOLOGÍA CLAVE DE LA ERA ESPACIAL Y LA COMPUTACIÓN</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--electric-blue);">1957 — PRESENTE</span>
+        </div>
+
+        <div class="timeline-track">
+          <div class="timeline-node">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year-tag">1957 • COMIENZA LA CARRERA</div>
+            <h4 class="timeline-title">Lanzamiento del Sputnik 1 (URSS)</h4>
+            <p class="timeline-desc">
+              La Unión Soviética coloca en órbita el primer satélite artificial, demostrando la viabilidad de los cohetes balísticos intercontinentales y desencadenando la Carrera Espacial.
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year-tag">1958 • NACIMIENTO DE LA NASA</div>
+            <h4 class="timeline-title">Creación de la NASA y la División de Langley</h4>
+            <p class="timeline-desc">
+              El presidente Eisenhower firma el acta de fundación de la NASA, absorbiendo al personal técnico de la NACA y consolidando a las calculistas de West Area Computing.
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year-tag">1961 • PRIMEROS HOMBRES EN EL ESPACIO</div>
+            <h4 class="timeline-title">Yuri Gagarin (Vostok 1) y Alan Shepard (Freedom 7)</h4>
+            <p class="timeline-desc">
+              Gagarin es el primer humano en orbitar la Tierra. Semanas después, Alan Shepard completa el primer vuelo suborbital tripulado de EE. UU., con trayectoria calculada por Katherine Johnson.
+            </p>
+          </div>
+
+          <div class="timeline-node highlight-node">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year-tag">1962 • HITO HISTÓRICO MERCURY-ATLAS 6</div>
+            <h4 class="timeline-title">John Glenn y la Verificación Manual de Katherine Johnson</h4>
+            <p class="timeline-desc">
+              Se instala la computadora IBM 7090. A petición de Glenn, Katherine Johnson comprueba personalmente a mano los cálculos orbitales antes de autorizar el despegue de la Friendship 7.
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year-tag">1969 • CUMBRE DE LA CARRERA ESPACIAL</div>
+            <h4 class="timeline-title">Misión Apolo 11 y Alunizaje</h4>
+            <p class="timeline-desc">
+              Neil Armstrong y Buzz Aldrin caminan sobre la Luna. Los cálculos de sincronización y trayectoria lunar continúan sustentándose en las fórmulas de Katherine Johnson.
+            </p>
+          </div>
+
+          <div class="timeline-node highlight-node">
+            <div class="timeline-dot"></div>
+            <div class="timeline-year-tag">SIMULACIÓN ACTUAL • TU MISIÓN</div>
+            <h4 class="timeline-title">Laboratorio Numérico Educativo 1962</h4>
+            <p class="timeline-desc">
+              Como calculista de la NASA en este simulador ficticio, tu desafío consiste en modelar, integrar con Euler y verificar el vuelo de un cohete experimental bajo resistencia lineal.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón de acción: Comenzar Desafío hacia la Sección 3 -->
+      <div class="challenge-cta-container">
+        <h3 style="color: var(--text-highlight); font-size: 1.3rem; margin-bottom: 0.75rem;">
+          ¿Listo para asumir el rol de calculista de vuelo?
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 650px; margin: 0 auto 1.5rem auto;">
+          Pasa al centro de operaciones balísticas para examinar el balance de fuerzas gravitacionales, empuje y resistencia aerodinámica que gobernarán el vuelo del cohete.
+        </p>
+        <a href="#planteamiento-problema" id="btn-start-challenge" class="btn-start-challenge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+          COMENZAR DESAFÍO
+        </a>
+      </div>
+
     </div>
   </section>
 

@@ -244,6 +244,18 @@ window.App = (function () {
       });
     }
 
+    // Botón "COMENZAR DESAFÍO" en contexto histórico
+    const btnStartChallenge = document.getElementById('btn-start-challenge');
+    if (btnStartChallenge) {
+      btnStartChallenge.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetSection = document.getElementById('planteamiento-problema');
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+
     // Botones de control del simulador (Lanzar, Pausar, Reiniciar)
     const btnLaunch = document.getElementById('btn-sim-launch');
     const btnPause = document.getElementById('btn-sim-pause');
