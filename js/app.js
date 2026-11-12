@@ -321,6 +321,10 @@ window.App = (function () {
       if (window.Simulation && typeof window.Simulation.syncWithState === 'function') {
         window.Simulation.syncWithState(state);
       }
+
+      if (window.EvaluationModule && typeof window.EvaluationModule.syncWithState === 'function') {
+        window.EvaluationModule.syncWithState(state);
+      }
     }
 
     // Re-renderizado reactivo continuo de MathJax tras cada actualización
@@ -349,7 +353,8 @@ window.App = (function () {
           document.getElementById('desafio-precision'),
           document.getElementById('heun-rk4'),
           document.getElementById('graficas-errores'),
-          document.getElementById('simulador-lanzamiento')
+          document.getElementById('simulador-lanzamiento'),
+          document.getElementById('evaluacion')
         ].filter(Boolean);
 
         if (window.MathJax.typesetClear && dynamicTargets.length > 0) {
