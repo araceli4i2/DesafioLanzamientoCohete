@@ -1117,45 +1117,239 @@
   <section id="solucion-analitica" class="section-wrapper">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Solución Exacta de Referencia</span>
+        <span class="section-tag">Solución Exacta de Referencia • Integración Analítica</span>
         <h2 class="section-title">Solución Analítica del Modelo Lineal</h2>
         <p class="section-subtitle">
-          Integración exacta de la ecuación diferencial lineal de primer orden como valor de contraste absoluto.
+          Deducción matemática formal por separación de variables, evaluación analítica exacta en $t = 20\text{ s}$ y contraste directo frente al método de Euler.
         </p>
       </div>
 
-      <div class="console-panel">
+      <!-- Panel 1: Deducción Formal Paso a Paso con MathJax -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
         <div class="panel-header-bar">
-          <span class="panel-title-text">SOLUCIÓN EXACTA (TEXTO DE REFERENCIA)</span>
-          <span class="panel-status-led"></span>
+          <span class="panel-title-text">DEDUCCIÓN PASO A PASO POR SEPARACIÓN DE VARIABLES (DATOS ORIGINALES)</span>
+          <span class="method-order-badge badge-rk4">SOLUCIÓN EXACTA DE REFERENCIA</span>
         </div>
 
-        <p>
-          La ecuación para la velocidad es una EDO lineal de primer orden de coeficientes constantes: $\dfrac{dv}{dt} + 0,1 v = 5,19$. Resolviendo con la condición inicial $v(0) = 0$, obtenemos la función exponencial exacta:
+        <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          La ecuación diferencial ordinaria para la velocidad es lineal de primer orden. Con los parámetros oficiales ($m = 1.000\text{ kg}$, $T = 15.000\text{ N}$, $g = 9,81\text{ m/s}²$, $k = 100\text{ kg/s}$), el desarrollo riguroso paso a paso es:
         </p>
 
-        <div class="equation-render" style="color: var(--electric-blue); font-size: 1.3rem;">
-          $$v(t) = 51,9 \left(1 - e^{-0,1 t}\right)$$
-        </div>
+        <!-- Bloques numerados del desarrollo algebraico (1 al 6) -->
+        <div class="math-steps-vertical">
+          <!-- Paso 1 -->
+          <div class="math-step-card">
+            <div class="math-step-header">
+              <span class="step-badge">PASO 1</span>
+              <span class="step-title">Ecuación Diferencial del Movimiento</span>
+            </div>
+            <p>A partir de la Segunda Ley de Newton con empuje ascendente, peso y resistencia lineal:</p>
+            <div class="equation-render" style="color: var(--sky-blue); font-size: 1.2rem;">
+              $$\frac{dv}{dt} = \frac{T}{m} - g - \frac{k}{m}v = \frac{15.000}{1.000} - 9,81 - \frac{100}{1.000}v = 5,19 - 0,1v$$
+            </div>
+          </div>
 
-        <p style="margin-top: 1.5rem;">
-          Integrando la velocidad $y(t) = \int_0^t v(\tau) d\tau$ con la condición de plataforma $y(0) = 0$, resulta la trayectoria analítica exacta en metros:
-        </p>
+          <!-- Paso 2 -->
+          <div class="math-step-card">
+            <div class="math-step-header">
+              <span class="step-badge">PASO 2</span>
+              <span class="step-title">Separación de Variables</span>
+            </div>
+            <p>Agrupando los términos que contienen a la variable dependiente $v$ en el miembro izquierdo y la variable independiente $t$ en el derecho:</p>
+            <div class="equation-render" style="color: var(--electric-blue); font-size: 1.2rem;">
+              $$\frac{dv}{5,19 - 0,1v} = dt$$
+            </div>
+          </div>
 
-        <div class="equation-render" style="color: var(--sky-blue); font-size: 1.3rem;">
-          $$y(t) = 51,9 t - 519 \left(1 - e^{-0,1 t}\right)$$
-        </div>
+          <!-- Paso 3 -->
+          <div class="math-step-card">
+            <div class="math-step-header">
+              <span class="step-badge">PASO 3</span>
+              <span class="step-title">Integración Indefinida de Ambos Miembros</span>
+            </div>
+            <p>Integrando mediante sustitución $u = 5,19 - 0,1v \implies du = -0,1\,dv \implies dv = -10\,du$:</p>
+            <div class="equation-render" style="font-size: 1.15rem;">
+              $$\int \frac{dv}{5,19 - 0,1v} = \int dt \implies -10 \ln|5,19 - 0,1v| = t + C_1$$
+            </div>
+            <p style="margin-top: 0.5rem;">Dividiendo entre $-10$ y aplicando la función exponencial en ambos miembros:</p>
+            <div class="equation-render" style="color: var(--mission-orange); font-size: 1.15rem;">
+              $$\ln|5,19 - 0,1v| = -0,1t - \frac{C_1}{10} \implies 5,19 - 0,1v = C \cdot e^{-0,1t}$$
+            </div>
+          </div>
 
-        <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
-          <strong>Velocidad terminal asintótica:</strong> A medida que $t \to \infty$, $e^{-0,1 t} \to 0$, por lo que la velocidad tiende asintóticamente al valor límite $v_\infty = \frac{T - mg}{k} = \frac{15.000 - 9.810}{100} = 51,9\text{ m/s}$.
-        </p>
+          <!-- Paso 4 -->
+          <div class="math-step-card">
+            <div class="math-step-header">
+              <span class="step-badge">PASO 4</span>
+              <span class="step-title">Condición Inicial de Velocidad $v(0) = 0$</span>
+            </div>
+            <p>El cohete parte en reposo sobre la torre de lanzamiento ($v(0) = 0$ en $t = 0$):</p>
+            <div class="equation-render" style="font-size: 1.15rem;">
+              $$5,19 - 0,1(0) = C \cdot e^0 \implies C = 5,19$$
+            </div>
+            <p style="margin-top: 0.5rem;">Sustituyendo el valor de la constante de integración $C$ y despejando $v(t)$:</p>
+            <div class="equation-render" style="color: var(--electric-blue); font-size: 1.25rem;">
+              $$5,19 - 0,1v = 5,19 e^{-0,1t} \implies 0,1v = 5,19\left(1 - e^{-0,1t}\right)$$
+              $$v(t) = \frac{5,19}{0,1}\left(1 - e^{-0,1t}\right) = 51,9\left(1 - e^{-0,1t}\right)\text{ m/s}$$
+            </div>
+          </div>
 
-        <!-- Contenedor preparado para la solución analítica -->
-        <div id="analytical-details-container" class="code-container-stub">
-          // Contenedor preparado: Las funciones evaluateAnalyticalVelocity y evaluateAnalyticalAltitude
-          // proveerán los valores de referencia para contrastar numéricamente el error global.
+          <!-- Paso 5 -->
+          <div class="math-step-card">
+            <div class="math-step-header">
+              <span class="step-badge">PASO 5</span>
+              <span class="step-title">Integración de la Posición $y(t) = \int v(t) dt$ con $y(0) = 0$</span>
+            </div>
+            <p>Integrando la función de velocidad respecto al tiempo:</p>
+            <div class="equation-render" style="font-size: 1.15rem;">
+              $$y(t) = \int 51,9\left(1 - e^{-0,1t}\right) dt = 51,9t - \frac{51,9}{-0,1}e^{-0,1t} + C_2 = 51,9t + 519e^{-0,1t} + C_2$$
+            </div>
+            <p style="margin-top: 0.5rem;">Evaluando la condición inicial de plataforma $y(0) = 0$:</p>
+            <div class="equation-render" style="font-size: 1.15rem;">
+              $$y(0) = 51,9(0) + 519 e^0 + C_2 = 0 \implies 519 + C_2 = 0 \implies C_2 = -519$$
+            </div>
+            <p style="margin-top: 0.5rem;">Factorizando $519$ obtenemos la ecuación analítica cerrada de la trayectoria:</p>
+            <div class="equation-render" style="color: var(--sky-blue); font-size: 1.25rem;">
+              $$y(t) = 51,9t - 519\left(1 - e^{-0,1t}\right)\text{ m}$$
+            </div>
+          </div>
+
+          <!-- Paso 6 -->
+          <div class="math-step-card highlight-step">
+            <div class="math-step-header">
+              <span class="step-badge badge-highlight">PASO 6</span>
+              <span class="step-title">Evaluación Numérica Exacta a los 20 Segundos ($t = 20\text{ s}$)</span>
+            </div>
+            <p>Sustituyendo explícitamente $t = 20\text{ s}$ con los valores de la función exponencial:</p>
+            <div class="equation-render" style="font-size: 1.05rem; color: var(--text-dim);">
+              $$e^{-0,1 \cdot 20} = e^{-2} \approx 0,13533528$$
+              $$1 - e^{-2} \approx 1 - 0,13533528 = 0,86466472$$
+            </div>
+            <p style="margin-top: 0.5rem;">Sustitución en velocidad:</p>
+            <div class="equation-render" style="color: var(--electric-blue); font-size: 1.25rem;">
+              $$v(20) = 51,9 \cdot \left(1 - e^{-2}\right) = 51,9 \cdot 0,86466472 = \mathbf{44,8761\text{ m/s}}$$
+            </div>
+            <p style="margin-top: 0.5rem;">Sustitución en altitud:</p>
+            <div class="equation-render" style="color: var(--mission-orange); font-size: 1.25rem;">
+              $$y(20) = 51,9 \cdot (20) - 519 \cdot \left(1 - e^{-2}\right) = 1.038 - 519 \cdot 0,86466472 = 1.038 - 448,7610 = \mathbf{589,2390\text{ m}}$$
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Panel 2: Formulación Generalizada (Cualquier Parámetro) -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">FORMULACIÓN ANALÍTICA GENERALIZADA ($a = T/m - g$, $b = k/m$)</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">LIBRERÍA MATHEMATICS.JS</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Implementada en las funciones puras <code>velocidadExacta(t, p)</code>, <code>alturaExacta(t, p)</code> y <code>aceleracionExacta(t, p)</code>:
+        </p>
+
+        <div class="math-equations-container">
+          <!-- Caso b != 0 -->
+          <div class="equation-card">
+            <div class="equation-card-title">CASO GENERAL CON RESISTENCIA ($b \ne 0$)</div>
+            <div class="equation-render" style="color: var(--sky-blue); font-size: 1.05rem;">
+              $$\begin{aligned}
+                v(t) &= v_0 e^{-bt} + \frac{a}{b}\left(1 - e^{-bt}\right) \\[8pt]
+                y(t) &= y_0 + \frac{v_0}{b}\left(1 - e^{-bt}\right) + \frac{a}{b}\left[t - \frac{1 - e^{-bt}}{b}\right]
+              \end{aligned}$$
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-dim); margin-top: 0.5rem;">
+              Velocidad límite asintótica: $v_\infty = \frac{a}{b} = \frac{T - mg}{k} = 51,90\text{ m/s}$.
+            </p>
+          </div>
+
+          <!-- Caso b = 0 -->
+          <div class="equation-card">
+            <div class="equation-card-title">CASO SIN RESISTENCIA ($b = 0$, TOLERANCIA $|b| < 10^{-12}$)</div>
+            <div class="equation-render" style="color: var(--mission-amber); font-size: 1.05rem;">
+              $$\begin{aligned}
+                v(t) &= v_0 + a \cdot t \\[8pt]
+                y(t) &= y_0 + v_0 \cdot t + \frac{1}{2} a \cdot t^2
+              \end{aligned}$$
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-dim); margin-top: 0.5rem;">
+              Movimiento Rectilíneo Uniformemente Acelerado (MRUV) en el vacío.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Tarjetas de Resultados Exactos a t = 20 s y Contraste vs Euler -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">CONTRASTE A LOS 20 SEGUNDOS: SOLUCIÓN EXACTA VS. MÉTODO DE EULER</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--electric-blue);">EVALUACIÓN FORMAL</span>
+        </div>
+
+        <div class="challenge-q1-grid">
+          <!-- Velocidad Exacta -->
+          <div class="q1-metric-card">
+            <div class="q1-card-label">Velocidad Exacta v(20 s)</div>
+            <div class="q1-card-value" id="exact-val-v20" style="color: var(--electric-blue);">44,8761 <span class="q1-card-unit">m/s</span></div>
+            <div class="q1-card-sub">Euler: 46,3273 m/s (Error: +1,4512 m/s)</div>
+          </div>
+
+          <!-- Altura Exacta -->
+          <div class="q1-metric-card highlight-metric">
+            <div class="q1-card-label">Altura Exacta y(20 s)</div>
+            <div class="q1-card-value" id="exact-val-y20" style="color: var(--mission-orange);">589,2390 <span class="q1-card-unit">m</span></div>
+            <div class="q1-card-sub">Euler: 574,7272 m (Error: -14,5118 m)</div>
+          </div>
+
+          <!-- Velocidad Terminal Asintótica -->
+          <div class="q1-metric-card">
+            <div class="q1-card-label">Velocidad Límite (v_inf)</div>
+            <div class="q1-card-value" id="exact-val-vinf">51,9000 <span class="q1-card-unit">m/s</span></div>
+            <div class="q1-card-sub">Asíntota teórica cuando t ➔ ∞</div>
+          </div>
+
+          <!-- Error Relativo en Altura -->
+          <div class="q1-metric-card">
+            <div class="q1-card-label">Error Relativo en Altura</div>
+            <div class="q1-card-value" id="exact-val-rely" style="color: var(--mission-amber);">2,46 <span class="q1-card-unit">%</span></div>
+            <div class="q1-card-sub">Discrepancia global de Euler (h = 2 s)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Tabla Comparativa Euler vs Exacta con Error Absoluto en Cada Instante -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">TABLA COMPARATIVA: MÉTODO DE EULER VS. SOLUCIÓN EXACTA</span>
+          <span id="analytical-table-step-info" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">
+            CONTRASTE PUNTO A PUNTO (h = 2,00 s)
+          </span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Discrepancia y error absoluto en cada instante temporal de la trayectoria. Todos los valores presentados con formato en coma decimal:
+        </p>
+
+        <div class="table-responsive-wrapper">
+          <table class="nasa-dynamic-table" id="analytical-comparison-table">
+            <thead>
+              <tr>
+                <th style="width: 60px; text-align: center;">n</th>
+                <th>Tiempo (s)</th>
+                <th>v Euler (m/s)</th>
+                <th>v Exacta (m/s)</th>
+                <th style="color: var(--sky-blue);">Error |v| (m/s)</th>
+                <th>y Euler (m)</th>
+                <th>y Exacta (m)</th>
+                <th style="color: var(--mission-orange);">Error |y| (m)</th>
+                <th style="text-align: right; color: var(--mission-amber);">Error Rel y (%)</th>
+              </tr>
+            </thead>
+            <tbody id="analytical-comparison-table-body">
+              <!-- Inyectado dinámicamente por app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </section>
 

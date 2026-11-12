@@ -315,6 +315,49 @@ window.App = (function () {
     if (validation.isValid) {
       updateEulerSection();
     }
+
+    // Re-renderizado reactivo continuo de MathJax tras cada actualización
+    scheduleMathJaxTypeset();
+  }
+
+  let mathjaxDebounceTimer = null;
+
+  /**
+   * Re-renderiza las expresiones matemáticas de MathJax de forma reactiva y con debounce.
+   * Se ejecuta tras cada actualización del estado o de los contenedores dinámicos.
+   */
+  function scheduleMathJaxTypeset() {
+    if (!window.MathJax || typeof window.MathJax.typesetPromise !== 'function') return;
+    if (mathjaxDebounceTimer) {
+      clearTimeout(mathjaxDebounceTimer);
+    }
+    mathjaxDebounceTimer = setTimeout(() => {
+      try {
+        const dynamicTargets = [
+          document.getElementById('math-params-summary'),
+          document.getElementById('dynamic-substituted-edo'),
+          document.getElementById('euler-liftoff-warning'),
+          document.getElementById('euler-steps-container'),
+          document.getElementById('solucion-analitica')
+        ].filter(Boolean);
+
+        if (window.MathJax.typesetClear && dynamicTargets.length > 0) {
+          try {
+            window.MathJax.typesetClear(dynamicTargets);
+          } catch (e) {
+            // Ignorar si typesetClear no está disponible
+          }
+        }
+
+        if (dynamicTargets.length > 0) {
+          window.MathJax.typesetPromise(dynamicTargets).catch(() => {});
+        } else {
+          window.MathJax.typesetPromise().catch(() => {});
+        }
+      } catch (err) {
+        console.warn('[App] Error al re-renderizar MathJax:', err);
+      }
+    }, 60);
   }
 
   /**
@@ -551,6 +594,9 @@ window.App = (function () {
       const totalSteps = currentEulerSeries.length - 1;
       stepInfoEl.textContent = `TOTAL PASOS: ${totalSteps} (h = ${formatNumber(state.h, 2, 2)} s | tf = ${formatNumber(state.tFinal, 0, 0)} s)`;
     }
+
+    // 5. Actualizar la Sección 6: Solución Analítica y Tabla Comparativa
+    updateAnalyticalSection(currentEulerSeries);
   }
 
   /**
@@ -798,6 +844,124 @@ window.App = (function () {
     if (window.MathJax && window.MathJax.typesetPromise) {
       window.MathJax.typesetPromise([container]).catch(() => {});
     }
+  }
+
+  /**
+   * Actualiza la Sección 6: Solución Analítica.
+   * Calcula los valores exactos, actualiza las tarjetas métricas de contraste y llena
+   * la tabla comparativa punto a punto Euler vs. Exacta con error absoluto y relativo en cada instante.
+   * 
+   * @param {Array<Object>} [eulerSeries] - Serie temporal de Euler (opcional, usa currentEulerSeries)
+   */
+  function updateAnalyticalSection(eulerSeries) {
+    if (!window.Mathematics) return;
+
+    const series = eulerSeries || currentEulerSeries;
+    if (!series || !series.length) return;
+
+    const p = state;
+    const tFinal = p.tFinal || 20.0;
+
+    // 1. Valores analíticos exactos evaluados en tFinal (ej. t = 20 s)
+    const vExactFin = window.Mathematics.velocidadExacta(tFinal, p);
+    const yExactFin = window.Mathematics.alturaExacta(tFinal, p);
+    const vInf = window.Mathematics.calculateTerminalVelocity(p.m, p.T, p.g, p.k);
+
+    const lastEuler = series[series.length - 1];
+    const diffV = lastEuler ? lastEuler.v - vExactFin : 0;
+    const diffY = lastEuler ? lastEuler.y - yExactFin : 0;
+    const relErrY = yExactFin > 0 ? (Math.abs(diffY) / yExactFin) * 100 : 0;
+
+    // 2. Actualizar tarjetas métricas de referencia
+    const elV20 = document.getElementById('exact-val-v20');
+    const elY20 = document.getElementById('exact-val-y20');
+    const elVinf = document.getElementById('exact-val-vinf');
+    const elRelY = document.getElementById('exact-val-rely');
+
+    if (elV20) {
+      elV20.innerHTML = `${formatNumber(vExactFin, 4, 4)} <span class="q1-card-unit">m/s</span>`;
+      const card = elV20.closest('.q1-metric-card');
+      const sub = card ? card.querySelector('.q1-card-sub') : null;
+      if (sub && lastEuler) {
+        const sign = diffV >= 0 ? '+' : '';
+        sub.textContent = `Euler: ${formatNumber(lastEuler.v, 4, 4)} m/s (Error: ${sign}${formatNumber(diffV, 4, 4)} m/s)`;
+      }
+    }
+
+    if (elY20) {
+      elY20.innerHTML = `${formatNumber(yExactFin, 4, 4)} <span class="q1-card-unit">m</span>`;
+      const card = elY20.closest('.q1-metric-card');
+      const sub = card ? card.querySelector('.q1-card-sub') : null;
+      if (sub && lastEuler) {
+        const sign = diffY >= 0 ? '+' : '';
+        sub.textContent = `Euler: ${formatNumber(lastEuler.y, 4, 4)} m (Error: ${sign}${formatNumber(diffY, 4, 4)} m)`;
+      }
+    }
+
+    if (elVinf) {
+      const card = elVinf.closest('.q1-metric-card');
+      const sub = card ? card.querySelector('.q1-card-sub') : null;
+      if (!isFinite(vInf) || isNaN(vInf) || p.k <= 0) {
+        elVinf.innerHTML = `No aplicable <span class="q1-card-unit">(k = 0)</span>`;
+        if (sub) sub.textContent = 'Sin resistencia: aceleración constante indefinida';
+      } else {
+        elVinf.innerHTML = `${formatNumber(vInf, 4, 4)} <span class="q1-card-unit">m/s</span>`;
+        if (sub) sub.textContent = 'Asíntota teórica cuando t ➔ ∞';
+      }
+    }
+
+    if (elRelY) {
+      const card = elRelY.closest('.q1-metric-card');
+      const sub = card ? card.querySelector('.q1-card-sub') : null;
+      if (yExactFin === 0 && (!lastEuler || lastEuler.y === 0)) {
+        elRelY.innerHTML = `0,00 <span class="q1-card-unit">%</span>`;
+        if (sub) sub.textContent = 'Sin discrepancia: reposo sobre plataforma';
+      } else {
+        elRelY.innerHTML = `${formatNumber(relErrY, 2, 2)} <span class="q1-card-unit">%</span>`;
+        if (sub) {
+          sub.textContent = `Discrepancia global en y (${formatNumber(Math.abs(diffY), 4, 4)} m con h = ${formatNumber(p.h, 2, 2)} s)`;
+        }
+      }
+    }
+
+    // 3. Info de la tabla comparativa
+    const tableInfoEl = document.getElementById('analytical-table-step-info');
+    if (tableInfoEl) {
+      tableInfoEl.textContent = `CONTRASTE PUNTO A PUNTO (TOTAL: ${series.length} INSTANTES | h = ${formatNumber(p.h, 2, 2)} s)`;
+    }
+
+    // 4. Renderizar filas de la tabla comparativa: Euler vs. Exacta
+    const tbody = document.getElementById('analytical-comparison-table-body');
+    if (!tbody) return;
+
+    const rowsHtml = series.map((step) => {
+      const t = step.t;
+      const vE = step.v;
+      const yE = step.y;
+
+      const vX = window.Mathematics.velocidadExacta(t, p);
+      const yX = window.Mathematics.alturaExacta(t, p);
+
+      const errV = Math.abs(vE - vX);
+      const errY = Math.abs(yE - yX);
+      const relYStep = yX > 0 ? (errY / yX) * 100 : 0;
+
+      return `
+        <tr>
+          <td class="col-step">${step.n}</td>
+          <td class="col-numeric">${formatNumber(t, 2, 2)}</td>
+          <td class="col-numeric">${formatNumber(vE, 4, 4)}</td>
+          <td class="col-numeric" style="color: var(--sky-blue);">${formatNumber(vX, 4, 4)}</td>
+          <td class="col-numeric" style="color: var(--electric-blue); font-weight: 600;">${formatNumber(errV, 4, 4)}</td>
+          <td class="col-numeric">${formatNumber(yE, 4, 4)}</td>
+          <td class="col-numeric" style="color: var(--sky-blue);">${formatNumber(yX, 4, 4)}</td>
+          <td class="col-numeric" style="color: var(--mission-orange); font-weight: 600;">${formatNumber(errY, 4, 4)}</td>
+          <td class="col-numeric" style="text-align: right; color: var(--mission-amber); font-weight: bold;">${formatNumber(relYStep, 2, 2)} %</td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = rowsHtml;
   }
 
   // =========================================================================
@@ -1095,6 +1259,7 @@ window.App = (function () {
     formatNumber: formatNumber,
     validateParameters: validateParameters,
     syncUIWithState: syncUIWithState,
-    updateEulerSection: updateEulerSection
+    updateEulerSection: updateEulerSection,
+    updateAnalyticalSection: updateAnalyticalSection
   };
 })();
