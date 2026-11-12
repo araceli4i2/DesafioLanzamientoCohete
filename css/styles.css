@@ -3899,7 +3899,368 @@ code, pre, .mono {
 }
 
 /* --------------------------------------------------------------------------
-   18. ESTILOS DE IMPRESIÓN OFICIAL (@MEDIA PRINT)
+   18. SECCIÓN 12: REFLEXIÓN Y CONCLUSIONES DEL DESAFÍO
+   -------------------------------------------------------------------------- */
+.challenge-conclusion-card {
+  background: linear-gradient(135deg, rgba(6, 14, 32, 0.95), rgba(14, 165, 233, 0.12));
+  border: 1px solid var(--border-console-bright);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.7);
+}
+
+.conclusion-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.conclusion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.conclusion-header-tag {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--sky-blue);
+  letter-spacing: 0.5px;
+}
+
+.conclusion-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.conclusion-card-metric {
+  background: rgba(6, 14, 32, 0.85);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-sm);
+  padding: 1.15rem 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.conclusion-card-metric.highlight-exact {
+  border-color: var(--electric-blue);
+  background: rgba(0, 229, 255, 0.06);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+}
+
+.metric-role-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.metric-val-main {
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.metric-unit {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.metric-val-sub {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.conclusion-core-statement {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-left: 4px solid var(--mission-amber);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.statement-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.statement-text {
+  font-size: 1.02rem;
+  color: #fef08a;
+  line-height: 1.65;
+}
+
+.statement-text strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.conclusion-film-legacy {
+  background: rgba(3, 7, 18, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+}
+
+.film-legacy-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--electric-blue);
+  margin-bottom: 0.75rem;
+}
+
+.film-legacy-text {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  line-height: 1.75;
+}
+
+.film-legacy-text strong {
+  color: #fff;
+}
+
+/* Panel de preguntas de reflexión */
+.reflection-deck {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+}
+
+.reflection-deck-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.deck-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.reflection-deck-title {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--sky-blue);
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.reflection-deck-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.btn-reflection-action {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-console);
+  background: rgba(6, 14, 32, 0.85);
+  color: var(--sky-blue);
+}
+
+.btn-reflection-action:hover {
+  border-color: var(--electric-blue);
+  color: #fff;
+  background: rgba(0, 229, 255, 0.12);
+}
+
+.btn-reflection-action.btn-copy:active,
+.btn-reflection-action.copied-success {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10B981;
+  color: #10B981;
+}
+
+.reflection-deck-intro {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.75rem;
+}
+
+/* Tarjeta individual de reflexión */
+.reflection-card {
+  background: rgba(6, 14, 32, 0.75);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-sm);
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.reflection-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.reflection-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.reflection-num-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: var(--sky-blue);
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.reflection-card-title {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.reflection-guide-note {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  background: rgba(3, 7, 18, 0.5);
+  border-left: 3px solid var(--sky-blue);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 0.85rem;
+  line-height: 1.5;
+}
+
+.reflection-guide-note strong {
+  color: var(--sky-blue);
+}
+
+.reflection-textarea {
+  width: 100%;
+  min-height: 115px;
+  background: #030712;
+  border: 1px solid var(--border-console);
+  border-radius: 4px;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  outline: none;
+  resize: vertical;
+  transition: all 0.2s ease;
+  margin-bottom: 0.75rem;
+}
+
+.reflection-textarea:focus {
+  border-color: var(--electric-blue);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.35);
+}
+
+.reflection-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.btn-save-reflection {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.45rem 0.85rem;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-console);
+  background: rgba(14, 165, 233, 0.1);
+  color: var(--sky-blue);
+}
+
+.btn-save-reflection:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: var(--electric-blue);
+  color: #fff;
+}
+
+.btn-save-reflection.btn-saved-flash {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #10B981;
+  color: #10B981;
+}
+
+.reflection-save-status {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  transition: all 0.3s ease;
+}
+
+.reflection-save-status.status-saved {
+  color: #10B981;
+  font-weight: 600;
+}
+
+@media (max-width: 1080px) {
+  .conclusion-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .conclusion-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .reflection-deck-actions {
+    width: 100%;
+  }
+  .btn-reflection-action {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   19. ESTILOS DE IMPRESIÓN OFICIAL (@MEDIA PRINT)
    -------------------------------------------------------------------------- */
 @media print {
   /* Ocultar elementos irrelevantes de navegación y controles interactivos */

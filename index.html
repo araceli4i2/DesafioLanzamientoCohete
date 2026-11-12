@@ -2376,22 +2376,186 @@
     <div class="container">
       <div class="section-header">
         <span class="section-tag">Legado y Epílogo</span>
-        <h2 class="section-title">Reflexión Histórica y Conclusiones</h2>
+        <h2 class="section-title">Reflexión y Conclusiones del Desafío</h2>
         <p class="section-subtitle">
-          La precisión matemática como garante de vidas humanas en los albores de la era espacial.
+          El valor de las matemáticas en decisiones críticas: de las calculistas de Langley a la verificación rigurosa de ecuaciones diferenciales.
         </p>
       </div>
 
-      <div class="conclusion-banner">
-        <h3 style="color: var(--electric-blue); font-size: 1.5rem; margin-bottom: 1rem;">
-          La Ciencia Numérica al Servicio de la Humanidad
-        </h3>
-        <p style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.8;">
-          El vuelo orbital del astronauta John Glenn en febrero de 1962 no fue únicamente un triunfo de la propulsión química, sino la consagración de la matemática aplicada. En una época de transición tecnológica entre las calculistas humanas y las primeras computadoras IBM 7090, la verificación rigurosa de algoritmos como Euler, Heun y Runge-Kutta demostró que la estabilidad numérica y el control estricto del error de truncamiento son condiciones indispensables en la astronáutica moderna.
+      <!-- Tarjeta Principal: Conclusión Cuantitativa y Epistemológica del Desafío -->
+      <div class="challenge-conclusion-card">
+        <div class="conclusion-card-header">
+          <div class="conclusion-header-left">
+            <span class="status-dot-green"></span>
+            <span class="conclusion-header-tag">SÍNTESIS CIENTÍFICA DEL DESAFÍO BALÍSTICO</span>
+          </div>
+          <span class="badge-mission-nasa">NASA MISSION 1962</span>
+        </div>
+
+        <!-- Tarjetas Cuantitativas Comparativas Euler vs Exacta -->
+        <div class="conclusion-metrics-grid">
+          <div class="conclusion-card-metric">
+            <div class="metric-role-tag">Euler (h = 2 s, t = 20 s)</div>
+            <div class="metric-val-main" id="conclusion-dyn-v-euler">46,3273 <span class="metric-unit">m/s</span></div>
+            <div class="metric-val-sub" id="conclusion-dyn-y-euler">Altitud: 574,7272 m</div>
+          </div>
+
+          <div class="conclusion-card-metric highlight-exact">
+            <div class="metric-role-tag">Solución Exacta (t = 20 s)</div>
+            <div class="metric-val-main cyan-glow" id="conclusion-dyn-v-exact">44,8761 <span class="metric-unit">m/s</span></div>
+            <div class="metric-val-sub" id="conclusion-dyn-y-exact">Altitud: 589,2390 m</div>
+          </div>
+
+          <div class="conclusion-card-metric">
+            <div class="metric-role-tag">Desviación en Velocidad</div>
+            <div class="metric-val-main amber-glow" id="conclusion-dyn-err-v">+1,4512 <span class="metric-unit">m/s</span></div>
+            <div class="metric-val-sub">Euler sobreestima en +3,23%</div>
+          </div>
+
+          <div class="conclusion-card-metric">
+            <div class="metric-role-tag">Desviación en Altitud</div>
+            <div class="metric-val-main amber-glow" id="conclusion-dyn-err-y">-14,5118 <span class="metric-unit">m</span></div>
+            <div class="metric-val-sub">Euler subestima en -2,46%</div>
+          </div>
+        </div>
+
+        <!-- Enunciado Central Requerido del Desafío -->
+        <div class="conclusion-core-statement">
+          <div class="statement-icon">💡</div>
+          <div class="statement-text">
+            <strong>Conclusión del desafío:</strong> con $h = 2\text{ s}$, Euler da $46,3273\text{ m/s}$ y $574,7272\text{ m}$ a los $20\text{ s}$; la solución exacta da $44,8761\text{ m/s}$ y $589,2390\text{ m}$. La diferencia demuestra que <strong>no basta con obtener un resultado numérico: hay que evaluar su error y decidir si cumple la precisión requerida</strong>.
+          </div>
+        </div>
+
+        <!-- Cierre con la idea central de la película y el aula -->
+        <div class="conclusion-film-legacy">
+          <h3 class="film-legacy-title">El Valor de las Matemáticas en Decisiones Críticas</h3>
+          <p class="film-legacy-text">
+            Al igual que ocurrió en febrero de 1962 con el histórico vuelo de John Glenn en la cápsula <em>Friendship 7</em> —donde el astronauta confió su vida a la verificación manual de <strong>Katherine Johnson</strong> antes que a la flamante computadora IBM 7090—, la ingeniería moderna descansa en la comprensión íntima de las herramientas de cálculo.
+          </p>
+          <p class="film-legacy-text" style="margin-top: 0.75rem;">
+            Esta es la idea central de la película <em>Talentos Ocultos (Hidden Figures)</em>, trasladada al aula universitaria: <strong>las ecuaciones diferenciales convertidas en resultados numéricos verificables, interpretados físicamente y comprendidos con sus limitaciones teóricas</strong>. Una computadora puede calcular millones de iteraciones por segundo, pero solo el criterio matemático del ser humano puede juzgar si un paso $h$ es seguro, si el error acumulado es admisible y si el modelo físico representa con fidelidad la realidad del vuelo.
+          </p>
+        </div>
+      </div>
+
+      <!-- Panel de Preguntas de Reflexión Crítica -->
+      <div class="reflection-deck">
+        <div class="reflection-deck-header">
+          <div class="deck-title-box">
+            <span class="status-dot-green"></span>
+            <h3 class="reflection-deck-title">PREGUNTAS DE ANÁLISIS CRÍTICO Y REFLEXIÓN</h3>
+          </div>
+          <div class="reflection-deck-actions">
+            <button type="button" id="btn-copy-reflections" class="btn-reflection-action btn-copy" title="Copiar todas las preguntas y respuestas al portapapeles">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              COPIAR RESPUESTAS
+            </button>
+            <button type="button" id="btn-download-reflections" class="btn-reflection-action btn-download" title="Descargar respuestas en un archivo de texto">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              DESCARGAR (.TXT)
+            </button>
+          </div>
+        </div>
+
+        <p class="reflection-deck-intro">
+          Redacta tus respuestas a las siguientes 5 interrogantes de análisis. Cada respuesta se almacena de forma persistente en tu sesión local de navegación para que no pierdas tu trabajo al recargar la página.
         </p>
-        <p style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.8; margin-top: 1rem;">
-          Katherine Johnson, Dorothy Vaughan y Mary Jackson superaron barreras sociales y raciales en el Centro de Investigación de Langley, consolidando con lápiz, papel y tenacidad intelectual el camino hacia la llegada del ser humano al espacio.
-        </p>
+
+        <!-- Pregunta 1 -->
+        <div class="reflection-card">
+          <div class="reflection-card-header">
+            <div class="reflection-num-pill">PREGUNTA 1</div>
+            <h4 class="reflection-card-title">1. ¿Por qué era importante verificar los cálculos antes de enviar astronautas al espacio?</h4>
+          </div>
+          <div class="reflection-guide-note">
+            <strong>Guía de análisis:</strong> Considera la transición tecnológica entre calculistas humanas y máquinas electrónicas (IBM 7090), la irreversibilidad de las maniobras orbitales, la ausencia de márgenes de error en la ventana de reentrada atmosférica y el imperativo ético de salvaguardar vidas humanas.
+          </div>
+          <textarea id="reflection-q1" class="reflection-textarea" rows="4" placeholder="Escribe aquí tu respuesta reflexiva sobre la verificación de cálculos y seguridad en misiones tripuladas..."></textarea>
+          <div class="reflection-card-footer">
+            <button type="button" class="btn-save-reflection" data-qid="1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              GUARDAR RESPUESTA
+            </button>
+            <span id="status-reflection-q1" class="reflection-save-status">Sin cambios guardados en sesión</span>
+          </div>
+        </div>
+
+        <!-- Pregunta 2 -->
+        <div class="reflection-card">
+          <div class="reflection-card-header">
+            <div class="reflection-num-pill">PREGUNTA 2</div>
+            <h4 class="reflection-card-title">2. ¿Qué riesgos existirían al utilizar un tamaño de paso demasiado grande?</h4>
+          </div>
+          <div class="reflection-guide-note">
+            <strong>Guía de análisis:</strong> Explica cómo el error local de truncamiento $O(h^2)$ y el error global $O(h)$ crecen rápidamente con $h$, pudiendo ocasionar inestabilidad numérica, trayectorias aberrantes, subestimación del consumo de combustible o fallos catastróficos en el ángulo de inserción orbital.
+          </div>
+          <textarea id="reflection-q2" class="reflection-textarea" rows="4" placeholder="Escribe aquí tu análisis sobre el impacto de un paso de integración h excesivamente amplio..."></textarea>
+          <div class="reflection-card-footer">
+            <button type="button" class="btn-save-reflection" data-qid="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              GUARDAR RESPUESTA
+            </button>
+            <span id="status-reflection-q2" class="reflection-save-status">Sin cambios guardados en sesión</span>
+          </div>
+        </div>
+
+        <!-- Pregunta 3 -->
+        <div class="reflection-card">
+          <div class="reflection-card-header">
+            <div class="reflection-num-pill">PREGUNTA 3</div>
+            <h4 class="reflection-card-title">3. ¿Por qué una aproximación puede parecer razonable y aun así acumular errores importantes?</h4>
+          </div>
+          <div class="reflection-guide-note">
+            <strong>Guía de análisis:</strong> Diferencia entre el error local por paso (que puede ser de milésimas de metro por segundo) y el error global acumulado a lo largo de cientos de iteraciones temporales. Analiza cómo la linealización de la tangente en curvas cóncavas acumula sesgos unidireccionales sistemáticos.
+          </div>
+          <textarea id="reflection-q3" class="reflection-textarea" rows="4" placeholder="Escribe aquí tu razonamiento sobre la propagación y acumulación acumulativa del error de truncamiento..."></textarea>
+          <div class="reflection-card-footer">
+            <button type="button" class="btn-save-reflection" data-qid="3">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              GUARDAR RESPUESTA
+            </button>
+            <span id="status-reflection-q3" class="reflection-save-status">Sin cambios guardados en sesión</span>
+          </div>
+        </div>
+
+        <!-- Pregunta 4 -->
+        <div class="reflection-card">
+          <div class="reflection-card-header">
+            <div class="reflection-num-pill">PREGUNTA 4</div>
+            <h4 class="reflection-card-title">4. ¿Qué variables reales del lanzamiento no fueron consideradas en nuestro modelo?</h4>
+          </div>
+          <div class="reflection-guide-note">
+            <strong>Guía de análisis:</strong> Enumera factores físicos omitidos: consumo continuo de masa propulsora ($m(t) = m_0 - \dot{m}t$, ecuación de Tsiolkovsky), densidad atmosférica decreciente con la altitud ($\rho(y)$), resistencia aerodinámica cuadrática no lineal ($v^2$), variación del campo gravitatorio $g(y) = G M / (R + y)^2$, vientos laterales y empuje vectorial orientable.
+          </div>
+          <textarea id="reflection-q4" class="reflection-textarea" rows="4" placeholder="Escribe aquí los efectos físicos y no linealidades que un modelo aeroespacial real de la NASA debe incorporar..."></textarea>
+          <div class="reflection-card-footer">
+            <button type="button" class="btn-save-reflection" data-qid="4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              GUARDAR RESPUESTA
+            </button>
+            <span id="status-reflection-q4" class="reflection-save-status">Sin cambios guardados en sesión</span>
+          </div>
+        </div>
+
+        <!-- Pregunta 5 -->
+        <div class="reflection-card">
+          <div class="reflection-card-header">
+            <div class="reflection-num-pill">PREGUNTA 5</div>
+            <h4 class="reflection-card-title">5. ¿Por qué el cálculo de una trayectoria lunar requiere un modelo mucho más complejo que el ascenso vertical de este ejercicio?</h4>
+          </div>
+          <div class="reflection-guide-note">
+            <strong>Guía de análisis:</strong> Describe el paso del movimiento unidilíneo 1D al espacio 3D, el problema gravitatorio de los tres cuerpos restringido (Tierra - Luna - Nave espacial), campos gravitacionales rotantes no homogéneos, órbitas elípticas e hiperbólicas de transferencia (inyección translunar TLI) y maniobras de reentrada balística de alta precisión.
+          </div>
+          <textarea id="reflection-q5" class="reflection-textarea" rows="4" placeholder="Escribe aquí sobre la dinámica orbital tridimensional, la interacción gravitacional múltiple y la complejidad del viaje lunar..."></textarea>
+          <div class="reflection-card-footer">
+            <button type="button" class="btn-save-reflection" data-qid="5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              GUARDAR RESPUESTA
+            </button>
+            <span id="status-reflection-q5" class="reflection-save-status">Sin cambios guardados en sesión</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>

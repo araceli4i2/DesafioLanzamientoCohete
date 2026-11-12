@@ -311,12 +311,13 @@ window.App = (function () {
     updateForcesDiagramSVG();
     updateDynamicSubstitutedEDO();
 
-    // Actualizar la Sección 5 (Euler), Sección 6 (Analítica), Sección 7 (Precisión), Sección 8 (Heun/RK4), Sección 9 (Gráficas) y Sección 10 (Simulador)
+    // Actualizar la Sección 5 (Euler), Sección 6 (Analítica), Sección 7 (Precisión), Sección 8 (Heun/RK4), Sección 9 (Gráficas), Sección 10 (Simulador) y Sección 12 (Reflexión)
     if (validation.isValid) {
       updateEulerSection();
       updatePrecisionSection();
       updateHeunRK4Section();
       updateChartsSection();
+      updateReflectionSection();
 
       if (window.Simulation && typeof window.Simulation.syncWithState === 'function') {
         window.Simulation.syncWithState(state);
@@ -354,7 +355,8 @@ window.App = (function () {
           document.getElementById('heun-rk4'),
           document.getElementById('graficas-errores'),
           document.getElementById('simulador-lanzamiento'),
-          document.getElementById('evaluacion')
+          document.getElementById('evaluacion'),
+          document.getElementById('reflexion-conclusiones')
         ].filter(Boolean);
 
         if (window.MathJax.typesetClear && dynamicTargets.length > 0) {
@@ -1410,6 +1412,323 @@ window.App = (function () {
   }
 
   // =========================================================================
+  // 5.7 SECCIÓN 12: REFLEXIÓN PEDAGÓGICA Y CONCLUSIONES DEL DESAFÍO
+  // =========================================================================
+
+  const REFLECTION_QUESTIONS = [
+    {
+      id: '1',
+      title: '1. ¿Por qué era importante verificar los cálculos antes de enviar astronautas al espacio?'
+    },
+    {
+      id: '2',
+      title: '2. ¿Qué riesgos existirían al utilizar un tamaño de paso demasiado grande?'
+    },
+    {
+      id: '3',
+      title: '3. ¿Por qué una aproximación puede parecer razonable y aun así acumular errores importantes?'
+    },
+    {
+      id: '4',
+      title: '4. ¿Qué variables reales del lanzamiento no fueron consideradas en nuestro modelo?'
+    },
+    {
+      id: '5',
+      title: '5. ¿Por qué el cálculo de una trayectoria lunar requiere un modelo mucho más complejo que el ascenso vertical de este ejercicio?'
+    }
+  ];
+
+  /**
+   * Actualiza dinámicamente las tarjetas métricas y textos de la Sección 12 (Reflexión y Conclusiones)
+   * según los parámetros activos de la simulación.
+   */
+  function updateReflectionSection() {
+    if (typeof document === 'undefined') return;
+
+    let vEuler = 46.32727993344;
+    let yEuler = 574.7272006656;
+    let vExact = 44.8760988;
+    let yExact = 589.239031;
+
+    if (window.NumericalMethods && typeof window.NumericalMethods.solveEuler === 'function') {
+      const eulerSeries = window.NumericalMethods.solveEuler(state);
+      if (eulerSeries && eulerSeries.length > 0) {
+        const last = eulerSeries[eulerSeries.length - 1];
+        vEuler = last.v;
+        yEuler = last.y;
+      }
+    }
+
+    if (window.Mathematics && typeof window.Mathematics.velocidadExacta === 'function') {
+      vExact = window.Mathematics.velocidadExacta(state.tFinal, state);
+      yExact = window.Mathematics.alturaExacta(state.tFinal, state);
+    }
+
+    const errV = Math.abs(vExact - vEuler);
+    const errY = Math.abs(yExact - yEuler);
+
+    const elVEuler = document.getElementById('conclusion-dyn-v-euler');
+    const elYEuler = document.getElementById('conclusion-dyn-y-euler');
+    const elVExact = document.getElementById('conclusion-dyn-v-exact');
+    const elYExact = document.getElementById('conclusion-dyn-y-exact');
+    const elErrV = document.getElementById('conclusion-dyn-err-v');
+    const elErrY = document.getElementById('conclusion-dyn-err-y');
+
+    if (elVEuler) elVEuler.innerHTML = `${formatNumber(vEuler, 2, 4)} <span class="metric-unit">m/s</span>`;
+    if (elYEuler) elYEuler.textContent = `Altitud: ${formatNumber(yEuler, 2, 4)} m`;
+
+    if (elVExact) elVExact.innerHTML = `${formatNumber(vExact, 2, 4)} <span class="metric-unit">m/s</span>`;
+    if (elYExact) elYExact.textContent = `Altitud: ${formatNumber(yExact, 2, 4)} m`;
+
+    if (elErrV) elErrV.innerHTML = `+${formatNumber(errV, 2, 4)} <span class="metric-unit">m/s</span>`;
+    if (elErrY) elErrY.innerHTML = `-${formatNumber(errY, 2, 4)} <span class="metric-unit">m</span>`;
+  }
+
+  /**
+   * Guarda una respuesta de reflexión individual en sessionStorage.
+   * 
+   * @param {string} qid - Número de la pregunta (1 a 5)
+   * @param {boolean} showFlash - Si debe mostrar retroalimentación animada en el botón
+   * @param {HTMLElement} btnElement - Elemento botón presionado
+   */
+  function saveSingleReflection(qid, showFlash, btnElement) {
+    if (typeof document === 'undefined') return;
+    const textarea = document.getElementById(`reflection-q${qid}`);
+    const statusEl = document.getElementById(`status-reflection-q${qid}`);
+    if (!textarea) return;
+
+    const textVal = textarea.value.trim();
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(`nasa_reflection_q${qid}`, textVal);
+      }
+    } catch (e) {
+      // Ignorar restricciones locales de almacenamiento
+    }
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    if (statusEl) {
+      statusEl.textContent = `Guardado en sesión ✔ (${timeStr})`;
+      statusEl.classList.add('status-saved');
+    }
+
+    if (showFlash && btnElement) {
+      btnElement.classList.add('btn-saved-flash');
+      const origText = btnElement.innerHTML;
+      btnElement.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><polyline points="20 6 9 17 4 12"/></svg>
+        ¡GUARDADO! ✔
+      `;
+      setTimeout(() => {
+        btnElement.classList.remove('btn-saved-flash');
+        btnElement.innerHTML = origText;
+      }, 1500);
+    }
+  }
+
+  /**
+   * Genera el documento de texto consolidado con las 5 respuestas y las conclusiones.
+   * 
+   * @returns {string} Texto formateado
+   */
+  function generateReflectionsTextDocument() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('es-ES', {
+      day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    const studentNameEl = typeof document !== 'undefined' ? document.getElementById('eval-student-name') : null;
+    const studentName = studentNameEl && studentNameEl.value.trim().length > 0
+      ? studentNameEl.value.trim()
+      : 'Estudiante de Métodos Numéricos';
+
+    let text = '================================================================================\n';
+    text += ' NASA MISSION 1962 — SIMULADOR BALÍSTICO MEDIANTE MÉTODOS NUMÉRICOS\n';
+    text += ' SECCIÓN 12: RESPUESTAS DE REFLEXIÓN CRÍTICA Y CONCLUSIONES DEL DESAFÍO\n';
+    text += '================================================================================\n\n';
+    text += `ESTUDIANTE: ${studentName}\n`;
+    text += `FECHA Y HORA: ${dateStr}\n`;
+    text += `PARÁMETROS DEL COHETE: Masa=${state.m} kg, Empuje=${state.T} N, g=${state.g} m/s², k=${state.k} kg/s, Paso h=${state.h} s, tFinal=${state.tFinal} s\n\n`;
+    text += '--------------------------------------------------------------------------------\n';
+    text += 'RESPUESTAS DE ANÁLISIS CRÍTICO DEL ESTUDIANTE\n';
+    text += '--------------------------------------------------------------------------------\n\n';
+
+    REFLECTION_QUESTIONS.forEach((q) => {
+      const textarea = typeof document !== 'undefined' ? document.getElementById(`reflection-q${q.id}`) : null;
+      const val = textarea && textarea.value.trim().length > 0
+        ? textarea.value.trim()
+        : '[Respuesta aún no redactada en la sesión]';
+
+      text += `PREGUNTA ${q.id}:\n${q.title}\n\n`;
+      text += `RESPUESTA:\n${val}\n\n`;
+      text += '--------------------------------------------------------------------------------\n\n';
+    });
+
+    text += '================================================================================\n';
+    text += 'CONCLUSIÓN DEL DESAFÍO:\n';
+    text += 'con h = 2 s, Euler da 46,3273 m/s y 574,7272 m a los 20 s; la solución exacta da\n';
+    text += '44,8761 m/s y 589,2390 m. La diferencia demuestra que no basta con obtener un\n';
+    text += 'resultado numérico: hay que evaluar su error y decidir si cumple la precisión requerida.\n\n';
+    text += 'IDEA CENTRAL DE LA PELÍCULA (HIDDEN FIGURES / TALENTOS OCULTOS):\n';
+    text += 'El valor de las matemáticas en decisiones críticas, trasladado al aula como ecuaciones\n';
+    text += 'diferenciales convertidas en resultados verificables, interpretados físicamente y con sus\n';
+    text += 'limitaciones.\n';
+    text += '================================================================================\n';
+
+    return text;
+  }
+
+  /**
+   * Copia las 5 respuestas y conclusiones al portapapeles del sistema.
+   * 
+   * @param {HTMLElement} btnElement - Botón que disparó la acción
+   */
+  function copyReflectionsToClipboard(btnElement) {
+    const text = generateReflectionsTextDocument();
+    const successFeedback = () => {
+      if (btnElement) {
+        btnElement.classList.add('copied-success');
+        const origHtml = btnElement.innerHTML;
+        btnElement.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><polyline points="20 6 9 17 4 12"/></svg>
+          ¡COPIADO! ✔
+        `;
+        setTimeout(() => {
+          btnElement.classList.remove('copied-success');
+          btnElement.innerHTML = origHtml;
+        }, 2200);
+      }
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(successFeedback).catch(() => {
+        fallbackCopyText(text, successFeedback);
+      });
+    } else {
+      fallbackCopyText(text, successFeedback);
+    }
+  }
+
+  /**
+   * Mecanismo alternativo para copiar texto en navegadores donde clipboard API esté restringido.
+   */
+  function fallbackCopyText(text, callback) {
+    if (typeof document === 'undefined') return;
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      if (callback) callback();
+    } catch (e) {
+      alert('Por favor, selecciona y copia el texto manualmente.');
+    }
+    document.body.removeChild(ta);
+  }
+
+  /**
+   * Descarga las 5 respuestas en un archivo de texto .txt.
+   */
+  function downloadReflectionsTextFile() {
+    const text = generateReflectionsTextDocument();
+    const studentNameEl = typeof document !== 'undefined' ? document.getElementById('eval-student-name') : null;
+    const studentName = studentNameEl && studentNameEl.value.trim().length > 0
+      ? studentNameEl.value.trim().replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, '_').replace(/\s+/g, '_')
+      : 'Estudiante';
+
+    if (typeof Blob === 'undefined' || typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function' || typeof document === 'undefined') {
+      return;
+    }
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Reflexiones_NASA_1962_${studentName}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Inicializa la persistencia en sesión y los eventos interactivos de la Sección 12.
+   */
+  function initReflectionSection() {
+    if (typeof document === 'undefined') return;
+
+    // 1. Cargar respuestas previas almacenadas en la sesión (sin backend)
+    REFLECTION_QUESTIONS.forEach((q) => {
+      const textarea = document.getElementById(`reflection-q${q.id}`);
+      const statusEl = document.getElementById(`status-reflection-q${q.id}`);
+      if (!textarea) return;
+
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          const saved = sessionStorage.getItem(`nasa_reflection_q${q.id}`);
+          if (saved !== null && saved !== undefined && saved.length > 0) {
+            textarea.value = saved;
+            if (statusEl) {
+              statusEl.textContent = 'Guardado en sesión ✔';
+              statusEl.classList.add('status-saved');
+            }
+          }
+        }
+      } catch (err) {
+        // Ignorar restricciones locales de sessionStorage si existieran
+      }
+
+      // Auto-guardado en input/blur con debounce
+      let debounceSave = null;
+      textarea.addEventListener('input', () => {
+        if (statusEl) {
+          statusEl.textContent = 'Modificado (sin guardar)...';
+          statusEl.classList.remove('status-saved');
+        }
+        if (debounceSave) clearTimeout(debounceSave);
+        debounceSave = setTimeout(() => {
+          saveSingleReflection(q.id, false);
+        }, 1200);
+      });
+    });
+
+    // 2. Vincular botones individuales de guardar respuesta
+    const saveBtns = document.querySelectorAll('.btn-save-reflection');
+    saveBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const qid = btn.getAttribute('data-qid');
+        saveSingleReflection(qid, true, btn);
+      });
+    });
+
+    // 3. Botón para copiar las 5 respuestas al portapapeles
+    const btnCopy = document.getElementById('btn-copy-reflections');
+    if (btnCopy) {
+      btnCopy.addEventListener('click', () => {
+        copyReflectionsToClipboard(btnCopy);
+      });
+    }
+
+    // 4. Botón para descargar las 5 respuestas como archivo de texto (.txt)
+    const btnDownload = document.getElementById('btn-download-reflections');
+    if (btnDownload) {
+      btnDownload.addEventListener('click', () => {
+        downloadReflectionsTextFile();
+      });
+    }
+
+    // 5. Renderizar métricas numéricas dinámicas iniciales
+    updateReflectionSection();
+  }
+
+  // =========================================================================
   // 6. CONTROLADORES DE EVENTOS Y VINCULACIÓN CON LA UI
   // =========================================================================
 
@@ -1767,6 +2086,9 @@ window.App = (function () {
       window.EvaluationModule.initEvaluation('quiz-container');
     }
 
+    // Inicializar sección 12 de reflexión y conclusiones
+    initReflectionSection();
+
     if (window.MathJax && window.MathJax.typesetPromise) {
       window.MathJax.typesetPromise().catch(() => {});
     }
@@ -1789,6 +2111,8 @@ window.App = (function () {
     updateAnalyticalSection: updateAnalyticalSection,
     updatePrecisionSection: updatePrecisionSection,
     updateHeunRK4Section: updateHeunRK4Section,
-    updateChartsSection: updateChartsSection
+    updateChartsSection: updateChartsSection,
+    updateReflectionSection: updateReflectionSection,
+    initReflectionSection: initReflectionSection
   };
 })();
