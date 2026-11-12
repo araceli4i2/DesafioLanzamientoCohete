@@ -1,0 +1,1149 @@
+/* ==========================================================================
+   NASA MISSION 1962 — SIMULADOR DE LANZAMIENTO ESPACIAL
+   Hoja de Estilos: styles.css
+   Inspiración: Centro de Control de la NASA (1962), Mercury-Atlas & Talentos Ocultos
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VARIABLES DE DISEÑO & PALETA RETRO-CIENTÍFICA
+   -------------------------------------------------------------------------- */
+:root {
+  --bg-space: #030712;
+  --bg-deep-blue: #060e20;
+  --bg-console: #0a162d;
+  --bg-card: #0d1e3d;
+  --bg-card-hover: #122852;
+  --border-console: rgba(56, 189, 248, 0.25);
+  --border-console-bright: rgba(0, 229, 255, 0.6);
+  
+  --electric-blue: #00e5ff;
+  --sky-blue: #38bdf8;
+  --mission-orange: #ff6b35;
+  --mission-amber: #f59e0b;
+  --terminal-green: #10b981;
+  --alert-red: #ef4444;
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-highlight: #ffffff;
+
+  --font-display: 'Orbitron', 'Space Grotesk', -apple-system, sans-serif;
+  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --nav-height: 72px;
+  --container-max-width: 1240px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  --shadow-console: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 229, 255, 0.1);
+  --shadow-glow: 0 0 20px rgba(0, 229, 255, 0.35);
+  --shadow-orange: 0 0 20px rgba(255, 107, 53, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   2. REINICIO & TIPOGRAFÍA BASE
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  background-color: var(--bg-space);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: 
+    radial-gradient(ellipse at 80% 20%, rgba(14, 165, 233, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 80%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
+    var(--bg-space);
+}
+
+/* Rejilla de instrumentación de fondo */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--text-highlight);
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--sky-blue);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--electric-blue);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+code, pre, .mono {
+  font-family: var(--font-mono);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------------------
+   3. BARRA DE NAVEGACIÓN FIJA & INDICADOR DE PROGRESO
+   -------------------------------------------------------------------------- */
+.progress-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(10, 22, 45, 0.8);
+  z-index: 1100;
+}
+
+.reading-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--sky-blue), var(--electric-blue), var(--mission-orange));
+  box-shadow: 0 0 10px var(--electric-blue);
+  transition: width 0.1s linear;
+}
+
+.fixed-header {
+  position: fixed;
+  top: 4px;
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
+  background: rgba(6, 14, 32, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-console);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-highlight);
+  letter-spacing: 0.1em;
+}
+
+.brand-logo-retro {
+  width: 38px;
+  height: 38px;
+  background: radial-gradient(circle, var(--electric-blue) 0%, #0369a1 70%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-console-bright);
+  box-shadow: var(--shadow-glow);
+  color: var(--bg-space);
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+.brand-year {
+  color: var(--mission-orange);
+  font-size: 0.85em;
+  background: rgba(255, 107, 53, 0.15);
+  border: 1px solid rgba(255, 107, 53, 0.4);
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+}
+
+.nav-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  list-style: none;
+}
+
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--electric-blue);
+  background: rgba(0, 229, 255, 0.08);
+  border-color: rgba(0, 229, 255, 0.3);
+}
+
+.nav-link.active {
+  color: var(--text-highlight);
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--electric-blue);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
+.telemetry-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--terminal-green);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.status-dot-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--terminal-green);
+  box-shadow: 0 0 8px var(--terminal-green);
+  animation: pulse-dot 1.8s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-console);
+  color: var(--electric-blue);
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   4. ESTILO COMÚN PARA SECCIONES & PANELES DE CONTROL
+   -------------------------------------------------------------------------- */
+.section-wrapper {
+  padding: 6rem 0 4rem 0;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-tag {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--mission-orange);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  background: rgba(255, 107, 53, 0.1);
+  padding: 0.2rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+.section-title {
+  font-size: 2.2rem;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, var(--text-highlight) 30%, var(--sky-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.console-panel {
+  background: var(--bg-console);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  box-shadow: var(--shadow-console);
+  position: relative;
+  overflow: hidden;
+}
+
+.console-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--sky-blue), var(--electric-blue), transparent);
+}
+
+.panel-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.panel-title-text {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--sky-blue);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-status-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mission-orange);
+  box-shadow: 0 0 8px var(--mission-orange);
+}
+
+/* --------------------------------------------------------------------------
+   5. SECCIÓN 1: INICIO / MISIÓN (HERO & COHETE SVG)
+   -------------------------------------------------------------------------- */
+#inicio {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  padding-top: calc(var(--nav-height) + 3rem);
+  padding-bottom: 5rem;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.hero-mission-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--mission-orange);
+  background: rgba(255, 107, 53, 0.12);
+  border: 1px solid rgba(255, 107, 53, 0.4);
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  line-height: 1.15;
+  margin-bottom: 1.25rem;
+  color: var(--text-highlight);
+}
+
+.hero-title .highlight-blue {
+  color: var(--electric-blue);
+  text-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+}
+
+.hero-description {
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.btn-primary-launch {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #030712;
+  background: linear-gradient(135deg, var(--mission-orange) 0%, #ff8c42 100%);
+  border: none;
+  padding: 1rem 2.2rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-orange);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.btn-primary-launch:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(255, 107, 53, 0.6);
+  color: #000;
+}
+
+.btn-secondary-console {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--sky-blue);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid var(--border-console);
+  padding: 0.95rem 1.6rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary-console:hover {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: var(--electric-blue);
+  color: var(--text-highlight);
+}
+
+.hero-mission-briefing {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  border-top: 1px solid rgba(56, 189, 248, 0.15);
+  padding-top: 1.5rem;
+}
+
+.briefing-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.briefing-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.briefing-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--electric-blue);
+  font-weight: 700;
+}
+
+/* Ilustración Cohete SVG */
+.rocket-illustration-box {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-console);
+}
+
+.rocket-svg-art {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.35));
+  animation: float-rocket 4s infinite ease-in-out;
+}
+
+@keyframes float-rocket {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* --------------------------------------------------------------------------
+   6. SECCIÓN 2: CONTEXTO HISTÓRICO & TALENTOS OCULTOS
+   -------------------------------------------------------------------------- */
+.history-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.history-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-image-container {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background: #020617;
+}
+
+.history-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.history-card:hover .history-image-container img {
+  transform: scale(1.03);
+}
+
+.image-attribution-caption {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: rgba(3, 7, 18, 0.85);
+  padding: 0.5rem 0.8rem;
+  border-top: 1px solid rgba(56, 189, 248, 0.2);
+  line-height: 1.4;
+}
+
+.image-attribution-caption a {
+  color: var(--sky-blue);
+  text-decoration: underline;
+}
+
+.history-content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.history-card-title {
+  font-size: 1.35rem;
+  color: var(--text-highlight);
+  margin-bottom: 0.75rem;
+}
+
+.quote-box {
+  background: rgba(0, 229, 255, 0.05);
+  border-left: 3px solid var(--electric-blue);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #e2e8f0;
+}
+
+/* --------------------------------------------------------------------------
+   7. SECCIÓN 3: PLANTEAMIENTO DEL PROBLEMA
+   -------------------------------------------------------------------------- */
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.forces-diagram-box {
+  background: var(--bg-console);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.forces-diagram-svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+}
+
+.problem-list {
+  list-style: none;
+  margin-top: 1rem;
+}
+
+.problem-list li {
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed rgba(56, 189, 248, 0.15);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.bullet-icon {
+  color: var(--mission-orange);
+  font-weight: bold;
+}
+
+/* --------------------------------------------------------------------------
+   8. SECCIÓN 4: MODELO MATEMÁTICO & PARÁMETROS
+   -------------------------------------------------------------------------- */
+.math-equations-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.equation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.equation-card-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sky-blue);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.equation-render {
+  font-size: 1.2rem;
+  margin: 1rem 0;
+  color: var(--text-highlight);
+  overflow-x: auto;
+}
+
+.param-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.param-badge {
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid var(--border-console);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.badge-value {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  color: var(--electric-blue);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   9. SECCIONES 5, 6, 7, 8: MÉTODOS NUMÉRICOS & PRECISIÓN
+   -------------------------------------------------------------------------- */
+.method-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.method-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.method-order-badge {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+}
+
+.badge-euler {
+  background: rgba(255, 107, 53, 0.15);
+  color: var(--mission-orange);
+  border: 1px solid rgba(255, 107, 53, 0.4);
+}
+
+.badge-heun {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--mission-amber);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.badge-rk4 {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--terminal-green);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.code-container-stub {
+  background: #020617;
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+/* --------------------------------------------------------------------------
+   10. SECCIÓN 9: GRÁFICAS Y ERRORES
+   -------------------------------------------------------------------------- */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.chart-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.1);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --------------------------------------------------------------------------
+   11. SECCIÓN 10: SIMULADOR DE LANZAMIENTO (CONSOLA NASA 1962)
+   -------------------------------------------------------------------------- */
+.simulator-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr 300px;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.control-deck {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+
+.deck-section-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--mission-orange);
+  margin-bottom: 1.25rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+  padding-bottom: 0.4rem;
+}
+
+.param-input-group {
+  margin-bottom: 1rem;
+}
+
+.param-input-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.param-val-display {
+  color: var(--electric-blue);
+  font-weight: bold;
+}
+
+.param-input {
+  width: 100%;
+  background: #020617;
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-sm);
+  color: var(--text-highlight);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.param-input:focus {
+  outline: none;
+  border-color: var(--electric-blue);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
+.viewport-deck {
+  background: #020617;
+  border: 1px solid var(--border-console-bright);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.simulation-svg-wrapper {
+  width: 100%;
+  height: 480px;
+  background: linear-gradient(180deg, #020617 0%, #081a3e 70%, #152238 100%);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.simulation-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Selector interactivo de paso h */
+.step-selector-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.step-selector-btn {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid var(--border-console);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.step-selector-btn:hover {
+  color: var(--electric-blue);
+  border-color: var(--electric-blue);
+  background: rgba(0, 229, 255, 0.12);
+}
+
+.step-selector-btn.active {
+  color: #030712;
+  background: var(--sky-blue);
+  border-color: var(--electric-blue);
+  font-weight: bold;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+.simulator-controls-bar {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.btn-ctrl {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-launch {
+  background: var(--mission-orange);
+  color: #030712;
+}
+
+.btn-launch:hover {
+  background: #ff854f;
+  box-shadow: var(--shadow-orange);
+}
+
+.btn-pause {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--mission-amber);
+  border: 1px solid var(--mission-amber);
+}
+
+.btn-pause:hover {
+  background: rgba(245, 158, 11, 0.3);
+}
+
+.btn-reset {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--alert-red);
+  border: 1px solid var(--alert-red);
+}
+
+.btn-reset:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.telemetry-deck {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+
+.telemetry-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.telemetry-metric-card {
+  background: #020617;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+}
+
+.metric-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.metric-number {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--electric-blue);
+  font-weight: 700;
+  margin-top: 0.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   12. SECCIONES 11 & 12: EVALUACIÓN Y REFLEXIÓN
+   -------------------------------------------------------------------------- */
+.quiz-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-console);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  margin-top: 1.5rem;
+}
+
+.conclusion-banner {
+  background: linear-gradient(135deg, rgba(6, 14, 32, 0.95), rgba(14, 165, 233, 0.15));
+  border: 1px solid var(--border-console-bright);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  margin-top: 2rem;
+  box-shadow: var(--shadow-console);
+}
+
+/* --------------------------------------------------------------------------
+   13. PIE DE PÁGINA ACADÉMICO (MÉTODOS NUMÉRICOS)
+   -------------------------------------------------------------------------- */
+.academic-footer {
+  background: #020617;
+  border-top: 1px solid var(--border-console);
+  padding: 3.5rem 0 2rem 0;
+  margin-top: 5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.footer-brand-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--text-highlight);
+  margin-bottom: 0.75rem;
+}
+
+.footer-academic-text {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.footer-col-title {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sky-blue);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.footer-links-list {
+  list-style: none;
+}
+
+.footer-links-list li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-links-list a {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.footer-links-list a:hover {
+  color: var(--electric-blue);
+}
+
+.footer-bottom-bar {
+  border-top: 1px solid rgba(56, 189, 248, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+/* --------------------------------------------------------------------------
+   14. RESPONSIVE DESIGN (DESKTOP, TABLET, MOBILE)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1080px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-mission-code, .hero-actions {
+    justify-content: center;
+  }
+
+  .hero-mission-briefing {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .simulator-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-grid, .history-cards-grid, .math-equations-container, .problem-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .method-comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 820px) {
+  .nav-links {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .nav-links.nav-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: var(--nav-height);
+    left: 0;
+    width: 100%;
+    background: rgba(6, 14, 32, 0.98);
+    border-bottom: 1px solid var(--border-console);
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+}
+

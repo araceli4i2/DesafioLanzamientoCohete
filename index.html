@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NASA MISSION 1962 — Simulador de Lanzamiento Espacial</title>
+  
+  <!-- Tipografías Google Fonts de corte aeroespacial y retro-científico -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <!-- Hoja de estilos del proyecto -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Configuración de MathJax para renderizado de fórmulas LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <!-- MathJax CDN -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- =======================================================================
+       BARRA SUPERIOR DE PROGRESO Y NAVEGACIÓN FIJA
+       ======================================================================= -->
+  <div class="progress-bar-container">
+    <div id="reading-progress-bar" class="reading-progress-bar"></div>
+  </div>
+
+  <header class="fixed-header">
+    <div class="nav-container">
+      <div class="brand-badge">
+        <div class="brand-logo-retro">☿</div>
+        <span>NASA MISSION <span class="brand-year">1962</span></span>
+      </div>
+
+      <nav class="nav-wrapper">
+        <ul id="nav-links" class="nav-links">
+          <li><a href="#inicio" class="nav-link active">1. Inicio</a></li>
+          <li><a href="#contexto-historico" class="nav-link">2. Historia</a></li>
+          <li><a href="#planteamiento-problema" class="nav-link">3. Problema</a></li>
+          <li><a href="#modelo-matematico" class="nav-link">4. Modelo</a></li>
+          <li><a href="#metodo-euler" class="nav-link">5. Euler</a></li>
+          <li><a href="#solucion-analitica" class="nav-link">6. Analítica</a></li>
+          <li><a href="#desafio-precision" class="nav-link">7. Precisión</a></li>
+          <li><a href="#heun-rk4" class="nav-link">8. Heun & RK4</a></li>
+          <li><a href="#graficas-errores" class="nav-link">9. Gráficas</a></li>
+          <li><a href="#simulador-lanzamiento" class="nav-link">10. Simulador</a></li>
+          <li><a href="#evaluacion" class="nav-link">11. Evaluación</a></li>
+          <li><a href="#reflexion-conclusiones" class="nav-link">12. Reflexión</a></li>
+        </ul>
+
+        <div class="telemetry-status-badge">
+          <span class="status-dot-pulse"></span>
+          <span id="mission-clock">MET +00:00:00</span>
+        </div>
+
+        <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Abrir menú de navegación">
+          ☰
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =======================================================================
+       1. SECCIÓN INICIO / MISIÓN (HERO & COHETE SVG)
+       ======================================================================= -->
+  <section id="inicio" class="section-wrapper">
+    <div class="container hero-grid">
+      <div class="hero-text-content">
+        <div class="hero-mission-code">
+          <span>PROJECT MERCURY</span>
+          <span>•</span>
+          <span>DESAFÍO 1962</span>
+          <span>•</span>
+          <span>FRIENDSHIP 7</span>
+        </div>
+
+        <h1 class="hero-title">
+          NASA MISSION 1962<br>
+          <span class="highlight-blue">Simulador de Lanzamiento Espacial</span>
+        </h1>
+
+        <p class="hero-description">
+          Un homenaje computacional a las calculistas de la NASA y a la hazaña histórica de <em>Talentos Ocultos (Hidden Figures)</em>. Explora cómo los <strong>métodos numéricos</strong> permitieron calcular y verificar a mano las trayectorias de ascenso en 1962, garantizando la seguridad en los primeros vuelos tripulados.
+        </p>
+
+        <div class="hero-actions">
+          <button id="btn-hero-start" class="btn-primary-launch">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            INICIAR SIMULACIÓN
+          </button>
+
+          <a href="#contexto-historico" class="btn-secondary-console">
+            EXPLORAR EXPEDIENTE HISTÓRICO ↓
+          </a>
+        </div>
+
+        <div class="hero-mission-briefing">
+          <div class="briefing-item">
+            <span class="briefing-label">Vehículo</span>
+            <span class="briefing-value">Cohete de Prueba 1962</span>
+          </div>
+          <div class="briefing-item">
+            <span class="briefing-label">Computadora</span>
+            <span class="briefing-value">IBM 7090 & K. Johnson</span>
+          </div>
+          <div class="briefing-item">
+            <span class="briefing-label">Masa de Despegue</span>
+            <span class="briefing-value" id="display-hero-m">1.000 kg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ilustración vectorial del cohete en SVG -->
+      <div class="rocket-illustration-box">
+        <svg class="rocket-svg-art" viewBox="0 0 260 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Estructura de torre de lanzamiento / Gantry (estilo retro) -->
+          <line x1="40" y1="80" x2="40" y2="480" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2" />
+          <line x1="20" y1="80" x2="20" y2="480" stroke="rgba(56, 189, 248, 0.15)" stroke-width="1.5" />
+          <line x1="20" y1="120" x2="40" y2="100" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.5" />
+          <line x1="20" y1="180" x2="40" y2="160" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.5" />
+          <line x1="20" y1="240" x2="40" y2="220" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.5" />
+          <line x1="20" y1="300" x2="40" y2="280" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.5" />
+          <line x1="20" y1="360" x2="40" y2="340" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.5" />
+          <line x1="20" y1="420" x2="40" y2="400" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.5" />
+          
+          <!-- Cápsula Mercury y Torre de Escape de Lanzamiento (LES) -->
+          <line x1="130" y1="30" x2="130" y2="75" stroke="#ef4444" stroke-width="2.5" />
+          <polygon points="126,25 134,25 130,12" fill="#ef4444" />
+          <line x1="123" y1="75" x2="137" y2="75" stroke="#ef4444" stroke-width="2" />
+          <line x1="124" y1="75" x2="128" y2="45" stroke="#f87171" stroke-width="1.5" />
+          <line x1="136" y1="75" x2="132" y2="45" stroke="#f87171" stroke-width="1.5" />
+
+          <!-- Cápsula cónica Friendship 7 -->
+          <polygon points="112,125 148,125 138,78 122,78" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+          <circle cx="130" cy="98" r="4" fill="#00e5ff" />
+          <ellipse cx="130" cy="126" rx="19" ry="3" fill="#ff6b35" />
+
+          <!-- Adaptador interestadual e insignia Mercury -->
+          <polygon points="106,145 154,145 148,126 112,126" fill="#334155" stroke="#38bdf8" stroke-width="1.5" />
+          <text x="130" y="141" text-anchor="middle" fill="#00e5ff" font-family="'Orbitron', sans-serif" font-size="8" font-weight="bold">☿ 7</text>
+
+          <!-- Cuerpo cilíndrico del Cohete -->
+          <rect x="104" y="145" width="52" height="235" rx="2" fill="url(#metalAtlasGradient)" stroke="#94a3b8" stroke-width="2" />
+          
+          <line x1="104" y1="200" x2="156" y2="200" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="4 2" />
+          <line x1="104" y1="280" x2="156" y2="280" stroke="#00e5ff" stroke-width="1.5" stroke-dasharray="4 2" />
+          
+          <!-- Rotulación NASA / UNITED STATES en tipografía de época -->
+          <g transform="rotate(-90 130 250)">
+            <text x="130" y="246" text-anchor="middle" fill="#0f172a" font-family="'Orbitron', sans-serif" font-size="11" font-weight="900" letter-spacing="4">UNITED STATES</text>
+          </g>
+
+          <!-- Aletas laterales aerodinámicas -->
+          <polygon points="94,360 104,330 104,380 92,385" fill="#475569" stroke="#64748b" stroke-width="1.5" />
+          <polygon points="166,360 156,330 156,380 168,385" fill="#475569" stroke="#64748b" stroke-width="1.5" />
+
+          <!-- Toberas de empuje -->
+          <polygon points="112,380 126,380 128,405 110,405" fill="#334155" stroke="#f59e0b" stroke-width="1.5" />
+          <polygon points="134,380 148,380 150,405 132,405" fill="#334155" stroke="#f59e0b" stroke-width="1.5" />
+          <polygon points="124,380 136,380 138,408 122,408" fill="#1e293b" stroke="#ff6b35" stroke-width="1.5" />
+
+          <!-- Penacho de fuego y plasma del encendido -->
+          <polygon points="108,406 152,406 130,480" fill="url(#fireOuterGrad)" opacity="0.9" />
+          <polygon points="116,406 144,406 130,460" fill="url(#fireInnerGrad)" />
+          <polygon points="122,406 138,406 130,435" fill="#ffffff" />
+
+          <ellipse cx="130" cy="425" rx="7" ry="2" fill="#ffffff" opacity="0.8" />
+          <ellipse cx="130" cy="445" rx="5" ry="1.5" fill="#ffffff" opacity="0.7" />
+
+          <!-- Plataforma base de hormigón -->
+          <rect x="40" y="480" width="180" height="24" rx="3" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+          <line x1="50" y1="492" x2="210" y2="492" stroke="#ff6b35" stroke-width="2" stroke-dasharray="10 6" />
+
+          <defs>
+            <linearGradient id="metalAtlasGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#94a3b8" />
+              <stop offset="40%" stop-color="#f8fafc" />
+              <stop offset="70%" stop-color="#cbd5e1" />
+              <stop offset="100%" stop-color="#64748b" />
+            </linearGradient>
+            <linearGradient id="fireOuterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ff6b35" />
+              <stop offset="60%" stop-color="#ea580c" />
+              <stop offset="100%" stop-color="transparent" />
+            </linearGradient>
+            <linearGradient id="fireInnerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fef08a" />
+              <stop offset="70%" stop-color="#f59e0b" />
+              <stop offset="100%" stop-color="transparent" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       2. SECCIÓN CONTEXTO HISTÓRICO & TALENTOS OCULTOS
+       ======================================================================= -->
+  <section id="contexto-historico" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Expediente Histórico 1962</span>
+        <h2 class="section-title">Katherine Johnson, John Glenn y la Era Mercury</h2>
+        <p class="section-subtitle">
+          El 20 de febrero de 1962, John Glenn se convirtió en el primer estadounidense en orbitar la Tierra a bordo de la cápsula Friendship 7. Detrás del éxito estuvo el rigor matemático de las mujeres calculistas de la NASA.
+        </p>
+      </div>
+
+      <div class="history-cards-grid">
+        <!-- Tarjeta 1: Katherine Johnson y el grupo de calculistas -->
+        <article class="history-card">
+          <div class="history-image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Katherine_Johnson_at_NASA%2C_in_1966.jpg" 
+                 alt="Katherine Johnson en su mesa de trabajo en la NASA (1966)" 
+                 loading="lazy">
+          </div>
+          <div class="image-attribution-caption">
+            <strong>Título:</strong> Katherine Johnson at NASA (1966).<br>
+            <strong>Autor:</strong> NASA (Dominio Público).<br>
+            <strong>Fuente:</strong> <a href="https://commons.wikimedia.org/wiki/File:Katherine_Johnson_at_NASA,_in_1966.jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons / NASA</a>
+          </div>
+          <div class="history-content">
+            <h3 class="history-card-title">Las Calculadoras Humanas del West Area</h3>
+            <p>
+              Antes de que las computadoras electrónicas fueran confiables, los cálculos de trayectoria, ventanas de lanzamiento y maniobras de reentrada atmosférica eran resueltos manualmente por mujeres afroamericanas como <strong>Katherine Johnson</strong>, <strong>Dorothy Vaughan</strong> y <strong>Mary Jackson</strong>.
+            </p>
+            <div class="quote-box">
+              "Si ella dice que los números están bien, entonces estoy listo para ir."
+              <br><small style="color: var(--sky-blue); font-family: var(--font-mono);">— John Glenn a los ingenieros de vuelo antes de abordar la Friendship 7</small>
+            </div>
+            <p>
+              Glenn desconfiaba de la flamante computadora electrónica IBM 7090 y solicitó expresamente que Katherine Johnson verificara a mano las ecuaciones orbitales y los puntos de cálculo numérico antes del lanzamiento.
+            </p>
+          </div>
+        </article>
+
+        <!-- Tarjeta 2: Sala de Control Mercury -->
+        <article class="history-card">
+          <div class="history-image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Mercury_Control_Center_during_Mercury-Atlas_6_mission_1962.jpg" 
+                 alt="Centro de Control Mercury en Cabo Cañaveral durante la misión Mercury-Atlas 6 (1962)" 
+                 loading="lazy">
+          </div>
+          <div class="image-attribution-caption">
+            <strong>Título:</strong> Mercury Control Center during Mercury-Atlas 6 mission (1962).<br>
+            <strong>Autor:</strong> NASA (Dominio Público).<br>
+            <strong>Fuente:</strong> <a href="https://commons.wikimedia.org/wiki/File:Mercury_Control_Center_during_Mercury-Atlas_6_mission_1962.jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons / NASA</a>
+          </div>
+          <div class="history-content">
+            <h3 class="history-card-title">La Transición hacia los Métodos Numéricos</h3>
+            <p>
+              El cálculo de la aceleración, velocidad y resistencia aerodinámica de un cohete propulsado requiere resolver ecuaciones diferenciales ordinarias mediante algoritmos paso a paso:
+            </p>
+            <ul style="margin-left: 1.25rem; color: var(--text-muted); margin-bottom: 1rem;">
+              <li>División del tiempo de ascenso en intervalos discretos $h = \Delta t$.</li>
+              <li>Actualización de la fuerza de empuje constante y el peso gravitacional.</li>
+              <li>Ajuste continuo por la resistencia aerodinámica lineal $k \cdot v$.</li>
+            </ul>
+            <p>
+              Una pequeña discrepancia en el paso de integración acumulaba errores considerables en la altitud final y en el punto de intercepción orbital.
+            </p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       3. SECCIÓN PLANTEAMIENTO DEL PROBLEMA
+       ======================================================================= -->
+  <section id="planteamiento-problema" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Mecánica de Vuelo</span>
+        <h2 class="section-title">Planteamiento del Problema Físico</h2>
+        <p class="section-subtitle">
+          Dinámica vertical de un cohete propulsado sometido a empuje ascendente, atracción gravitatoria y resistencia aerodinámica lineal.
+        </p>
+      </div>
+
+      <div class="problem-grid">
+        <div class="console-panel">
+          <div class="panel-header-bar">
+            <span class="panel-title-text">BALANCE DE FUERZAS EN ASCENSO VERTICAL</span>
+            <span class="panel-status-led"></span>
+          </div>
+
+          <p>
+            Consideramos un vehículo espacial de masa $m = 1.000\text{ kg}$ en trayectoria vertical unidimensional desde la plataforma de despegue. Sobre el cohete actúan exactamente tres fuerzas:
+          </p>
+
+          <ul class="problem-list">
+            <li>
+              <span class="bullet-icon">▲</span>
+              <div>
+                <strong>Empuje del motor ($T$):</strong> Fuerza propulsora constante hacia arriba generada por la tobera, con un valor de $T = 15.000\text{ N}$.
+              </div>
+            </li>
+            <li>
+              <span class="bullet-icon">▼</span>
+              <div>
+                <strong>Peso gravitacional ($m \cdot g$):</strong> Fuerza de atracción hacia abajo ejercida por la Tierra, con $g = 9,81\text{ m/s}²$. Para $m = 1.000\text{ kg}$, el peso equivale a $m \cdot g = 9.810\text{ N}$.
+              </div>
+            </li>
+            <li>
+              <span class="bullet-icon">▼</span>
+              <div>
+                <strong>Resistencia aerodinámica LINEAL ($k \cdot v$):</strong> Fuerza de fricción viscosa con el aire opuesta a la velocidad, directamente proporcional a $v$ con constante de resistencia $k = 100\text{ kg/s}$.
+              </div>
+            </li>
+          </ul>
+
+          <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(56, 189, 248, 0.08); border-radius: var(--radius-sm);">
+            <strong>Fuerza Neta Vertical:</strong>
+            $$F_{neta} = T - m \cdot g - k \cdot v$$
+            <strong>Objetivo Computacional:</strong> Calcular la altitud $y(t)$ y la velocidad $v(t)$ durante el intervalo $t \in [0, 20\text{ s}]$, partiendo del reposo en la plataforma: $y(0) = 0\text{ m}$, $v(0) = 0\text{ m/s}$.
+          </div>
+        </div>
+
+        <div class="forces-diagram-box">
+          <h4 style="margin-bottom: 1rem; color: var(--sky-blue); font-family: var(--font-mono);">DIAGRAMA DE CUERPO LIBRE</h4>
+          <svg class="forces-diagram-svg" viewBox="0 0 240 320" fill="none">
+            <!-- Cohete esquemático -->
+            <rect x="105" y="100" width="30" height="110" rx="4" fill="#0d1e3d" stroke="#00e5ff" stroke-width="2" />
+            <polygon points="105,100 135,100 120,60" fill="#ff6b35" />
+            <polygon points="95,190 105,170 105,210" fill="#38bdf8" />
+            <polygon points="145,190 135,170 135,210" fill="#38bdf8" />
+            <circle cx="120" cy="150" r="4" fill="#ffffff" />
+
+            <!-- Vector Empuje T hacia arriba -->
+            <line x1="120" y1="60" x2="120" y2="15" stroke="#00e5ff" stroke-width="3" />
+            <polygon points="120,10 114,24 126,24" fill="#00e5ff" />
+            <text x="135" y="26" fill="#00e5ff" font-family="'Share Tech Mono'" font-size="13" font-weight="bold">T = 15.000 N</text>
+
+            <!-- Vector Gravedad Fg hacia abajo -->
+            <line x1="110" y1="210" x2="110" y2="280" stroke="#f59e0b" stroke-width="3" />
+            <polygon points="110,288 104,274 116,274" fill="#f59e0b" />
+            <text x="10" y="275" fill="#f59e0b" font-family="'Share Tech Mono'" font-size="12">mg = 9.810 N</text>
+
+            <!-- Vector Resistencia LINEAL Fres hacia abajo -->
+            <line x1="130" y1="210" x2="130" y2="265" stroke="#ef4444" stroke-width="3" />
+            <polygon points="130,273 124,259 136,259" fill="#ef4444" />
+            <text x="142" y="260" fill="#ef4444" font-family="'Share Tech Mono'" font-size="12">Fres = k·v</text>
+          </svg>
+          <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); text-align: center; margin-top: 0.5rem;">
+            Ecuación de equilibrio dinámico: $F_{neta} = T - mg - kv$
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       4. SECCIÓN MODELO MATEMÁTICO & PARÁMETROS
+       ======================================================================= -->
+  <section id="modelo-matematico" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Ecuaciones Diferenciales</span>
+        <h2 class="section-title">Modelo Matemático del Vuelo</h2>
+        <p class="section-subtitle">
+          Formulación del problema de valor inicial con resistencia lineal y parámetros numéricos del desafío.
+        </p>
+      </div>
+
+      <div class="math-equations-container">
+        <div class="equation-card">
+          <div class="equation-card-title">SEGUNDA LEY DE NEWTON (EDO LINEAL)</div>
+          <div class="equation-render">
+            $$m \frac{dv}{dt} = T - m g - k v$$
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Dividiendo entre la masa $m$, obtenemos la aceleración instantánea:
+          </p>
+          <div class="equation-render" style="font-size: 1.05rem; color: var(--sky-blue);">
+            $$\frac{dv}{dt} = \frac{T}{m} - g - \frac{k}{m} v$$
+          </div>
+        </div>
+
+        <div class="equation-card">
+          <div class="equation-card-title">SUSTITUCIÓN CON LOS DATOS DEL DESAFÍO</div>
+          <p style="font-size: 0.88rem; color: var(--text-muted); text-align: left; margin-bottom: 0.5rem;">
+            Con $m = 1.000\text{ kg}$, $T = 15.000\text{ N}$, $g = 9,81\text{ m/s}²$ y $k = 100\text{ kg/s}$:
+          </p>
+          <div class="equation-render">
+            $$\frac{T}{m} - g = \frac{15.000}{1.000} - 9,81 = 15 - 9,81 = 5,19$$
+            $$\frac{k}{m} = \frac{100}{1.000} = 0,1$$
+          </div>
+          <div class="equation-render" style="font-size: 1.15rem; color: var(--electric-blue);">
+            $$\begin{cases} 
+              \dfrac{dy}{dt} = v \\[8pt] 
+              \dfrac{dv}{dt} = 5,19 - 0,1 v 
+            \end{cases}$$
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-dim);">
+            Condiciones iniciales: $v(0) = 0\text{ m/s}$, $y(0) = 0\text{ m}$.
+          </p>
+        </div>
+      </div>
+
+      <div class="console-panel">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">PARÁMETROS COMPARTIDOS DEL DESAFÍO (ESTADO CENTRAL)</span>
+          <span class="panel-status-led"></span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">
+          Todas las secciones consumen exactamente estos parámetros centralizados en <code>app.js</code>:
+        </p>
+        <div id="math-params-summary" class="param-summary-grid">
+          <!-- Inyectado dinámicamente por app.js con formato en coma decimal -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       5. SECCIÓN MÉTODO DE EULER
+       ======================================================================= -->
+  <section id="metodo-euler" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Método de Primer Orden</span>
+        <h2 class="section-title">Método de Euler Explícito</h2>
+        <p class="section-subtitle">
+          Aproximación por diferencias finitas hacia adelante: integración paso a paso de la velocidad y posición.
+        </p>
+      </div>
+
+      <div class="console-panel">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">FÓRMULAS DE RECURRENCIA DE EULER</span>
+          <span class="method-order-badge badge-euler">ORDEN 1 — GLOBAL O(h)</span>
+        </div>
+
+        <p>
+          Dado un paso temporal $h = \Delta t$, el método de Euler actualiza el estado en el instante $t_{n+1} = t_n + h$ evaluando la aceleración y la velocidad al inicio del intervalo:
+        </p>
+
+        <div class="equation-render">
+          $$\begin{aligned}
+            v_{n+1} &= v_n + h \left(\frac{T}{m} - g - \frac{k}{m} v_n\right) \\[8pt]
+            y_{n+1} &= y_n + h \cdot v_n
+          \end{aligned}$$
+        </div>
+
+        <p style="margin-top: 1rem; color: var(--text-muted);">
+          Sustituyendo los parámetros numéricos de nuestra misión ($5,19 - 0,1 v_n$):
+        </p>
+
+        <div class="equation-render" style="color: var(--mission-orange);">
+          $$\begin{aligned}
+            v_{n+1} &= v_n + h \cdot (5,19 - 0,1 \cdot v_n) \\[8pt]
+            y_{n+1} &= y_n + h \cdot v_n
+          \end{aligned}$$
+        </div>
+
+        <!-- Contenedor preparado para la visualización del método de Euler -->
+        <div id="euler-details-container" class="code-container-stub">
+          // Contenedor preparado: En la siguiente fase se enlazarán los resultados de numerical-methods.js (solveEuler)
+          // La interfaz presentará aquí la tabla de iteraciones con h = 2 s, 1 s, 0,5 s y 0,25 s.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       6. SECCIÓN SOLUCIÓN ANALÍTICA
+       ======================================================================= -->
+  <section id="solucion-analitica" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Solución Exacta de Referencia</span>
+        <h2 class="section-title">Solución Analítica del Modelo Lineal</h2>
+        <p class="section-subtitle">
+          Integración exacta de la ecuación diferencial lineal de primer orden como valor de contraste absoluto.
+        </p>
+      </div>
+
+      <div class="console-panel">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">SOLUCIÓN EXACTA (TEXTO DE REFERENCIA)</span>
+          <span class="panel-status-led"></span>
+        </div>
+
+        <p>
+          La ecuación para la velocidad es una EDO lineal de primer orden de coeficientes constantes: $\dfrac{dv}{dt} + 0,1 v = 5,19$. Resolviendo con la condición inicial $v(0) = 0$, obtenemos la función exponencial exacta:
+        </p>
+
+        <div class="equation-render" style="color: var(--electric-blue); font-size: 1.3rem;">
+          $$v(t) = 51,9 \left(1 - e^{-0,1 t}\right)$$
+        </div>
+
+        <p style="margin-top: 1.5rem;">
+          Integrando la velocidad $y(t) = \int_0^t v(\tau) d\tau$ con la condición de plataforma $y(0) = 0$, resulta la trayectoria analítica exacta en metros:
+        </p>
+
+        <div class="equation-render" style="color: var(--sky-blue); font-size: 1.3rem;">
+          $$y(t) = 51,9 t - 519 \left(1 - e^{-0,1 t}\right)$$
+        </div>
+
+        <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          <strong>Velocidad terminal asintótica:</strong> A medida que $t \to \infty$, $e^{-0,1 t} \to 0$, por lo que la velocidad tiende asintóticamente al valor límite $v_\infty = \frac{T - mg}{k} = \frac{15.000 - 9.810}{100} = 51,9\text{ m/s}$.
+        </p>
+
+        <!-- Contenedor preparado para la solución analítica -->
+        <div id="analytical-details-container" class="code-container-stub">
+          // Contenedor preparado: Las funciones evaluateAnalyticalVelocity y evaluateAnalyticalAltitude
+          // proveerán los valores de referencia para contrastar numéricamente el error global.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       7. SECCIÓN DESAFÍO DE PRECISIÓN
+       ======================================================================= -->
+  <section id="desafio-precision" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Sensibilidad y Estabilidad</span>
+        <h2 class="section-title">El Desafío de la Precisión Numérica</h2>
+        <p class="section-subtitle">
+          Evaluación del impacto del paso temporal $h$ en la convergencia del método de Euler y verificación de Katherine Johnson.
+        </p>
+      </div>
+
+      <div class="console-panel">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">SELECTOR DE PASO TEMPORAL ($h$)</span>
+          <span class="panel-status-led"></span>
+        </div>
+
+        <p>
+          Para el desafío de lanzamiento, analizaremos el comportamiento y acumulación del error de truncamiento evaluando cuatro tamaños de paso representativos:
+        </p>
+
+        <!-- Selector visual de paso h -->
+        <div class="step-selector-group" style="margin: 1.5rem 0;">
+          <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim); margin-right: 0.75rem;">SELECCIONAR PASO $h$:</span>
+          <button type="button" class="step-selector-btn active" data-h="2">h = 2 s (Base)</button>
+          <button type="button" class="step-selector-btn" data-h="1">h = 1 s</button>
+          <button type="button" class="step-selector-btn" data-h="0.5">h = 0,5 s</button>
+          <button type="button" class="step-selector-btn" data-h="0.25">h = 0,25 s</button>
+        </div>
+
+        <ul class="problem-list">
+          <li>
+            <span class="bullet-icon">●</span>
+            <div><strong>Paso $h = 2\text{ s}$ (10 pasos en 20 s):</strong> Produce la mayor discrepancia en altitud y velocidad final debido a la aproximación lineal gruesa.</div>
+          </li>
+          <li>
+            <span class="bullet-icon">●</span>
+            <div><strong>Paso $h = 1\text{ s}$ (20 pasos):</strong> Reduce el error de truncamiento local aproximadamente a la mitad.</div>
+          </li>
+          <li>
+            <span class="bullet-icon">●</span>
+            <div><strong>Paso $h = 0,5\text{ s}$ (40 pasos) y $h = 0,25\text{ s}$ (80 pasos):</strong> Convergencia continua hacia la trayectoria analítica exacta $y(t) = 51,9t - 519(1 - e^{-0,1t})$.</div>
+          </li>
+        </ul>
+
+        <!-- Contenedor preparado para experimentos de precisión -->
+        <div id="precision-challenge-container" class="code-container-stub">
+          // Contenedor preparado: En la fase de cálculo se vinculará la tabla comparativa de error global vs paso h.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       8. SECCIÓN HEUN Y RUNGE-KUTTA (RK4)
+       ======================================================================= -->
+  <section id="heun-rk4" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Métodos de Orden Superior</span>
+        <h2 class="section-title">Métodos de Heun y Runge-Kutta 4 (RK4)</h2>
+        <p class="section-subtitle">
+          Técnicas avanzadas de integración con múltiples muestras de pendiente para maximizar la exactitud en el ascenso.
+        </p>
+      </div>
+
+      <div class="method-comparison-grid">
+        <!-- Método de Euler -->
+        <div class="method-card">
+          <span class="method-order-badge badge-euler">EULER — ORDEN 1</span>
+          <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">1 Pendiente</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); flex: 1;">
+            Toma la tangente en $t_n$. Rápido pero acumula error acumulativo $O(h)$.
+          </p>
+          <div class="mono" style="font-size: 0.8rem; color: var(--mission-orange);">Error: $O(h)$</div>
+        </div>
+
+        <!-- Método de Heun -->
+        <div class="method-card">
+          <span class="method-order-badge badge-heun">HEUN — ORDEN 2</span>
+          <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">Predictor-Corrector</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); flex: 1;">
+            Promedia la pendiente al inicio y una predicción al final del intervalo.
+          </p>
+          <div class="mono" style="font-size: 0.8rem; color: var(--mission-amber);">Error: $O(h^2)$</div>
+        </div>
+
+        <!-- Método RK4 -->
+        <div class="method-card">
+          <span class="method-order-badge badge-rk4">RK4 — ORDEN 4</span>
+          <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">4 Pendientes Ponderadas</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); flex: 1;">
+            Muestreo óptimo al inicio, dos en el punto medio y uno al final del paso.
+          </p>
+          <div class="mono" style="font-size: 0.8rem; color: var(--terminal-green);">Error: $O(h^4)$</div>
+        </div>
+      </div>
+
+      <!-- Contenedor preparado para las fórmulas y tablas de Heun y RK4 -->
+      <div id="heun-rk4-container" class="code-container-stub" style="margin-top: 1.5rem;">
+        // Contenedor preparado: Enlace con las salidas numéricas de solveHeun y solveRK4 en numerical-methods.js
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       9. SECCIÓN GRÁFICAS Y ERRORES
+       ======================================================================= -->
+  <section id="graficas-errores" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Telemetría Comparativa</span>
+        <h2 class="section-title">Gráficas de Trayectoria, Velocidad y Error</h2>
+        <p class="section-subtitle">
+          Superposición de la Solución Analítica, Euler, Heun y RK4 para validar la convergencia.
+        </p>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Gráfica de Altitud y(t) -->
+        <div class="chart-card">
+          <div class="panel-header-bar">
+            <span class="panel-title-text">TRAYECTORIA VERTICAL: $y(t)$</span>
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">[m vs s]</span>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="chart-trajectory"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfica de Velocidad v(t) -->
+        <div class="chart-card">
+          <div class="panel-header-bar">
+            <span class="panel-title-text">VELOCIDAD ASCENDENTE: $v(t)$</span>
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--electric-blue);">[m/s vs s]</span>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="chart-velocity"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfica de Comparación de Error Global -->
+      <div class="chart-card" style="margin-top: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">ERROR ABSOLUTO GLOBAL RESPECTO A LA SOLUCIÓN ANALÍTICA</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--mission-orange);">|y_num - y_exact|</span>
+        </div>
+        <div class="chart-canvas-wrapper" style="height: 260px;">
+          <canvas id="chart-errors"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       10. SECCIÓN SIMULADOR DE LANZAMIENTO (CONSOLA DE CONTROL NASA 1962)
+       ======================================================================= -->
+  <section id="simulador-lanzamiento" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Consola Interactiva</span>
+        <h2 class="section-title">Centro de Control de Cabo Cañaveral</h2>
+        <p class="section-subtitle">
+          Ajusta los parámetros físicos, ejecuta la integración numérica y observa el despegue en el visor SVG.
+        </p>
+      </div>
+
+      <div class="simulator-layout">
+        <!-- Panel Izquierdo: Parámetros de Control (Entrada) -->
+        <aside class="control-deck">
+          <div class="deck-section-title">PARÁMETROS DE MISIÓN</div>
+
+          <div class="param-input-group">
+            <label class="param-input-label" for="input-m">
+              <span>Masa ($m$):</span>
+              <span id="display-m" class="param-val-display">1.000 kg</span>
+            </label>
+            <input type="number" id="input-m" class="param-input" value="1000" step="50" min="100">
+          </div>
+
+          <div class="param-input-group">
+            <label class="param-input-label" for="input-T">
+              <span>Empuje ($T$):</span>
+              <span id="display-T" class="param-val-display">15.000 N</span>
+            </label>
+            <input type="number" id="input-T" class="param-input" value="15000" step="500" min="1000">
+          </div>
+
+          <div class="param-input-group">
+            <label class="param-input-label" for="input-g">
+              <span>Gravedad ($g$):</span>
+              <span id="display-g" class="param-val-display">9,81 m/s²</span>
+            </label>
+            <input type="number" id="input-g" class="param-input" value="9.81" step="0.01">
+          </div>
+
+          <div class="param-input-group">
+            <label class="param-input-label" for="input-k">
+              <span>Resistencia lineal ($k$):</span>
+              <span id="display-k" class="param-val-display">100 kg/s</span>
+            </label>
+            <input type="number" id="input-k" class="param-input" value="100" step="5" min="0">
+          </div>
+
+          <div class="param-input-group">
+            <label class="param-input-label" for="input-h">
+              <span>Paso tiempo ($h$):</span>
+              <span id="display-h" class="param-val-display">2,00 s</span>
+            </label>
+            <input type="number" id="input-h" class="param-input" value="2" step="0.25" min="0.01" max="5">
+          </div>
+
+          <div class="param-input-group">
+            <label class="param-input-label" for="input-tFinal">
+              <span>Tiempo Vuelo ($t_f$):</span>
+              <span id="display-tFinal" class="param-val-display">20 s</span>
+            </label>
+            <input type="number" id="input-tFinal" class="param-input" value="20" step="1" min="5" max="100">
+          </div>
+
+          <div class="param-input-group" style="display: none;">
+            <input type="number" id="input-v0" value="0">
+            <input type="number" id="input-y0" value="0">
+          </div>
+        </aside>
+
+        <!-- Panel Central: Contenedor SVG de la Simulación y Controles de Vuelo -->
+        <main class="viewport-deck">
+          <div id="rocket-svg-container" class="simulation-svg-wrapper">
+            <svg id="rocket-svg" viewBox="0 0 600 480" class="simulation-svg" xmlns="http://www.w3.org/2000/svg">
+              <!-- Fondo de atmósfera y espacio (preparado para renderizado en fase 9) -->
+              <rect width="600" height="480" fill="url(#skyGradientStub)" />
+              <line x1="0" y1="450" x2="600" y2="450" stroke="#38bdf8" stroke-width="2" />
+              <!-- Plataforma de lanzamiento esquemática en reposo -->
+              <rect x="250" y="440" width="100" height="15" fill="#1e293b" stroke="#38bdf8" />
+              <!-- Cohete esquemático SVG preparado en pad -->
+              <g id="svg-rocket-group" transform="translate(290, 370)">
+                <rect x="5" y="10" width="10" height="50" fill="#f8fafc" stroke="#94a3b8" />
+                <polygon points="5,10 15,10 10,0" fill="#ef4444" />
+                <polygon points="0,55 5,45 5,60" fill="#475569" />
+                <polygon points="20,55 15,45 15,60" fill="#475569" />
+              </g>
+              <text x="300" y="240" text-anchor="middle" fill="rgba(56, 189, 248, 0.4)" font-family="'Share Tech Mono'" font-size="14">
+                VISOR VECTORIAL SVG — EN ESPERA DE LANZAMIENTO (FASE 9)
+              </text>
+              <defs>
+                <linearGradient id="skyGradientStub" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#020617" />
+                  <stop offset="60%" stop-color="#081a3e" />
+                  <stop offset="100%" stop-color="#152238" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          
+          <div class="simulator-controls-bar">
+            <button id="btn-sim-launch" class="btn-ctrl btn-launch">▲ LANZAR COHETE</button>
+            <button id="btn-sim-pause" class="btn-ctrl btn-pause">⏸ PAUSAR</button>
+            <button id="btn-sim-reset" class="btn-ctrl btn-reset">↺ REINICIAR</button>
+          </div>
+        </main>
+
+        <!-- Panel Derecho: Tarjetas Numéricas de Telemetría -->
+        <aside class="telemetry-deck">
+          <div class="deck-section-title">TELEMETRÍA EN VIVO</div>
+
+          <div class="telemetry-cards-stack">
+            <div class="telemetry-metric-card">
+              <div class="metric-title">Altitud actual ($y$)</div>
+              <div id="telem-altitude" class="metric-number">0,00 <span style="font-size: 0.9rem;">m</span></div>
+            </div>
+
+            <div class="telemetry-metric-card">
+              <div class="metric-title">Velocidad vertical ($v$)</div>
+              <div id="telem-velocity" class="metric-number">0,00 <span style="font-size: 0.9rem;">m/s</span></div>
+            </div>
+
+            <div class="telemetry-metric-card">
+              <div class="metric-title">Aceleración neta ($a$)</div>
+              <div id="telem-accel" class="metric-number">0,00 <span style="font-size: 0.9rem;">m/s²</span></div>
+            </div>
+
+            <div class="telemetry-metric-card">
+              <div class="metric-title">Tiempo transcurrido ($t$)</div>
+              <div id="telem-time" class="metric-number">0,00 <span style="font-size: 0.9rem;">s</span></div>
+            </div>
+
+            <div class="telemetry-metric-card">
+              <div class="metric-title">Estado de Vuelo</div>
+              <div id="telem-status" class="metric-number" style="font-size: 1.1rem; color: var(--terminal-green);">LISTO EN PAD</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       11. SECCIÓN EVALUACIÓN
+       ======================================================================= -->
+  <section id="evaluacion" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Validación Académica</span>
+        <h2 class="section-title">Evaluación de Conocimientos</h2>
+        <p class="section-subtitle">
+          Comprueba tu comprensión sobre la formulación lineal, órdenes de convergencia y el papel histórico de Katherine Johnson.
+        </p>
+      </div>
+
+      <div class="quiz-wrapper">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">BANCO DE PREGUNTAS: MÉTODOS NUMÉRICOS</span>
+          <span class="panel-status-led"></span>
+        </div>
+
+        <!-- Contenedor dinámico del cuestionario -->
+        <div id="quiz-container">
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            El módulo de evaluación interactiva cargará aquí las preguntas pedagógicas preparadas en <code>evaluation.js</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       12. SECCIÓN REFLEXIÓN Y CONCLUSIONES
+       ======================================================================= -->
+  <section id="reflexion-conclusiones" class="section-wrapper">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Legado y Epílogo</span>
+        <h2 class="section-title">Reflexión Histórica y Conclusiones</h2>
+        <p class="section-subtitle">
+          La precisión matemática como garante de vidas humanas en los albores de la era espacial.
+        </p>
+      </div>
+
+      <div class="conclusion-banner">
+        <h3 style="color: var(--electric-blue); font-size: 1.5rem; margin-bottom: 1rem;">
+          La Ciencia Numérica al Servicio de la Humanidad
+        </h3>
+        <p style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.8;">
+          El vuelo orbital del astronauta John Glenn en febrero de 1962 no fue únicamente un triunfo de la propulsión química, sino la consagración de la matemática aplicada. En una época de transición tecnológica entre las calculistas humanas y las primeras computadoras IBM 7090, la verificación rigurosa de algoritmos como Euler, Heun y Runge-Kutta demostró que la estabilidad numérica y el control estricto del error de truncamiento son condiciones indispensables en la astronáutica moderna.
+        </p>
+        <p style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.8; margin-top: 1rem;">
+          Katherine Johnson, Dorothy Vaughan y Mary Jackson superaron barreras sociales y raciales en el Centro de Investigación de Langley, consolidando con lápiz, papel y tenacidad intelectual el camino hacia la llegada del ser humano al espacio.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       PIE DE PÁGINA ACADÉMICO (ASIGNATURA MÉTODOS NUMÉRICOS)
+       ======================================================================= -->
+  <footer class="academic-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-title">NASA MISSION 1962 — SIMULADOR CIENTÍFICO</div>
+          <p class="footer-academic-text">
+            Proyecto desarrollado para la asignatura de <strong>Métodos Numéricos</strong>.<br>
+            Facultad de Ingeniería • Escuela de Ciencias de la Computación.<br>
+            Diseñado como recurso pedagógico interactivo para el estudio de sistemas dinámicos y ecuaciones diferenciales ordinarias (EDO).
+          </p>
+        </div>
+
+        <div>
+          <div class="footer-col-title">MÉTODOS TRATADOS</div>
+          <ul class="footer-links-list">
+            <li><a href="#metodo-euler">Método de Euler Explícito</a></li>
+            <li><a href="#heun-rk4">Método de Heun (Orden 2)</a></li>
+            <li><a href="#heun-rk4">Runge-Kutta 4 (RK4)</a></li>
+            <li><a href="#solucion-analitica">Solución Exacta Analítica</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-col-title">ARCHIVOS DEL SISTEMA</div>
+          <ul class="footer-links-list">
+            <li><code>mathematics.js</code></li>
+            <li><code>numerical-methods.js</code></li>
+            <li><code>simulation.js</code></li>
+            <li><code>charts.js</code></li>
+            <li><code>evaluation.js</code></li>
+            <li><code>app.js</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <span>© 1962–2026 Proyecto Académico Métodos Numéricos. Inspirado en <em>Hidden Figures</em>.</span>
+        <span>Simulador Científico en Español • Separación Modular MVC</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =======================================================================
+       CARGA ORDENADA DE SCRIPTS (SEPARACIÓN DE RESPONSABILIDADES)
+       ======================================================================= -->
+  <!-- 1. Módulo matemático analítico puro -->
+  <script src="js/mathematics.js"></script>
+
+  <!-- 2. Módulo de algoritmos y métodos numéricos -->
+  <script src="js/numerical-methods.js"></script>
+
+  <!-- 3. Módulo de visualización gráfica (Chart.js) -->
+  <script src="js/charts.js"></script>
+
+  <!-- 4. Módulo de animación y simulación de vuelo (Contenedor SVG) -->
+  <script src="js/simulation.js"></script>
+
+  <!-- 5. Módulo de evaluación pedagógica y cuestionario -->
+  <script src="js/evaluation.js"></script>
+
+  <!-- 6. Núcleo de la aplicación: Estado Central y Sincronización UI -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
