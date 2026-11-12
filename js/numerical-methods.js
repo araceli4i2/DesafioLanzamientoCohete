@@ -651,6 +651,53 @@ window.NumericalMethods = (function () {
     };
   }
 
+  /**
+   * Resuelve el sistema simultáneamente con Euler, Heun, RK4 y la solución analítica exacta,
+   * sincronizados en cada instante temporal t_n.
+   * 
+   * @param {Object} params - Parámetros { m, T, g, k, v0, y0, tFinal, h }
+   * @returns {Object} { euler, heun, rk4, rows, checkAtT2 }
+   */
+  function solveAllMethods(params) {
+    const p = params || {};
+    const sEuler = solveEuler(p);
+    const sHeun = solveHeun(p);
+    const sRK4 = solveRK4(p);
+
+    const length = sEuler.length;
+    const rows = [];
+
+    for (let i = 0; i < length; i++) {
+      const t = sEuler[i].t;
+      const ptEuler = sEuler[i];
+      const ptHeun = sHeun[i] || { v: 0, y: 0, a: 0 };
+      const ptRK4 = sRK4[i] || { v: 0, y: 0, a: 0 };
+
+      const vEx = window.Mathematics ? window.Mathematics.velocidadExacta(t, p) : 0;
+      const yEx = window.Mathematics ? window.Mathematics.alturaExacta(t, p) : 0;
+
+      rows.push({
+        n: ptEuler.n,
+        t: t,
+        euler: { v: ptEuler.v, y: ptEuler.y, a: ptEuler.a },
+        heun: { v: ptHeun.v, y: ptHeun.y, a: ptHeun.a },
+        rk4: { v: ptRK4.v, y: ptRK4.y, a: ptRK4.a },
+        exact: { v: vEx, y: yEx }
+      });
+    }
+
+    // Punto canónico de comprobación en t = 2 s
+    const check2 = rows.find(r => Math.abs(r.t - 2.0) < 1e-4) || rows[1] || rows[0];
+
+    return {
+      euler: sEuler,
+      heun: sHeun,
+      rk4: sRK4,
+      rows: rows,
+      checkAtT2: check2
+    };
+  }
+
   // API pública expuesta
   return {
     evalAcceleration: evalAcceleration,
@@ -663,6 +710,7 @@ window.NumericalMethods = (function () {
     solveRK4: solveRK4,
     calculateErrors: calculateErrors,
     analyzeConvergence: analyzeConvergence,
-    getPrecisionChallengeData: getPrecisionChallengeData
+    getPrecisionChallengeData: getPrecisionChallengeData,
+    solveAllMethods: solveAllMethods
   };
 })();

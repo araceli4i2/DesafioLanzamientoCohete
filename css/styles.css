@@ -2344,6 +2344,136 @@ code, pre, .mono {
 }
 
 /* --------------------------------------------------------------------------
+   15.4 ESTILOS DE LA SECCIÓN 8: MÉTODOS DE HEUN Y RUNGE-KUTTA (RK4)
+   -------------------------------------------------------------------------- */
+.canonical-test-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.15rem;
+  margin-top: 1rem;
+}
+
+.canonical-test-card {
+  background: rgba(13, 27, 56, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 6px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.25s ease;
+}
+
+.canonical-test-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.canonical-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+  padding-bottom: 0.45rem;
+}
+
+.canonical-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.canonical-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.stat-lbl {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.stat-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #fff;
+}
+
+.canonical-diff {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  margin-top: 0.35rem;
+  line-height: 1.35;
+}
+
+.method-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.btn-method-tab {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid var(--border-console);
+  padding: 0.5rem 1.1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-method-tab:hover {
+  color: var(--electric-blue);
+  border-color: var(--electric-blue);
+  background: rgba(0, 229, 255, 0.1);
+}
+
+.btn-method-tab.active {
+  color: #030712;
+  background: var(--sky-blue);
+  border-color: var(--electric-blue);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+#multi-method-comparison-table {
+  min-width: 820px;
+}
+
+/* Modos de filtro de columnas en la tabla multi-método */
+#multi-method-comparison-table.filter-euler .col-heun,
+#multi-method-comparison-table.filter-euler .col-rk4 {
+  display: none !important;
+}
+
+#multi-method-comparison-table.filter-heun .col-euler,
+#multi-method-comparison-table.filter-heun .col-rk4 {
+  display: none !important;
+}
+
+#multi-method-comparison-table.filter-rk4 .col-euler,
+#multi-method-comparison-table.filter-rk4 .col-heun {
+  display: none !important;
+}
+
+#multi-method-comparison-table.filter-euler,
+#multi-method-comparison-table.filter-heun,
+#multi-method-comparison-table.filter-rk4 {
+  min-width: 540px;
+}
+
+/* --------------------------------------------------------------------------
    16. RESPONSIVE DESIGN (DESKTOP, TABLET, MOBILE)
    -------------------------------------------------------------------------- */
 @media (max-width: 1080px) {

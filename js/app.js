@@ -311,10 +311,11 @@ window.App = (function () {
     updateForcesDiagramSVG();
     updateDynamicSubstitutedEDO();
 
-    // Actualizar la Sección 5 (Método de Euler), Sección 6 (Analítica) y Sección 7 (Precisión)
+    // Actualizar la Sección 5 (Euler), Sección 6 (Analítica), Sección 7 (Precisión) y Sección 8 (Heun/RK4)
     if (validation.isValid) {
       updateEulerSection();
       updatePrecisionSection();
+      updateHeunRK4Section();
     }
 
     // Re-renderizado reactivo continuo de MathJax tras cada actualización
@@ -340,7 +341,8 @@ window.App = (function () {
           document.getElementById('euler-liftoff-warning'),
           document.getElementById('euler-steps-container'),
           document.getElementById('solucion-analitica'),
-          document.getElementById('desafio-precision')
+          document.getElementById('desafio-precision'),
+          document.getElementById('heun-rk4')
         ].filter(Boolean);
 
         if (window.MathJax.typesetClear && dynamicTargets.length > 0) {
@@ -1152,6 +1154,116 @@ window.App = (function () {
     tbody.innerHTML = rowsHtml;
   }
 
+  let activeMethodFilter = 'all';
+
+  /**
+   * Actualiza la Sección 8: Métodos de Heun y Runge-Kutta 4 (RK4).
+   * - Resuelve el sistema acoplado con vector de estado X = [y, v] simultáneamente para Euler, Heun, RK4 y Exacta.
+   * - Comprobación canónica a t = 2 s (Heun v=9,342, y=10,38 ; RK4 v≈9,4076).
+   * - Renderiza la tabla comparativa multi-método: Tiempo | Euler (v, y) | Heun (v, y) | RK4 (v, y) | Analítica (v, y).
+   * - Aplica los botones de selección y filtros (Euler, Heun, RK4, Todos).
+   */
+  function updateHeunRK4Section() {
+    if (!window.NumericalMethods || typeof window.NumericalMethods.solveAllMethods !== 'function') {
+      return;
+    }
+
+    const allData = window.NumericalMethods.solveAllMethods(state);
+    if (!allData || !allData.rows) return;
+
+    // 1. Info del paso temporal activo
+    const stepInfoEl = document.getElementById('multi-method-table-step-info');
+    if (stepInfoEl) {
+      stepInfoEl.textContent = `PASO ACTIVO: h = ${formatNumber(state.h, 2, 2)} s | TOTAL INSTANTES: ${allData.rows.length}`;
+    }
+
+    // 2. Comprobación canónica a t = 2 s
+    const check2 = allData.checkAtT2;
+    if (check2) {
+      const elEulerV = document.getElementById('t2-val-euler-v');
+      const elEulerY = document.getElementById('t2-val-euler-y');
+      const elDiffEuler = document.getElementById('t2-diff-euler');
+
+      const elHeunV = document.getElementById('t2-val-heun-v');
+      const elHeunY = document.getElementById('t2-val-heun-y');
+      const elDiffHeun = document.getElementById('t2-diff-heun');
+
+      const elRk4V = document.getElementById('t2-val-rk4-v');
+      const elRk4Y = document.getElementById('t2-val-rk4-y');
+      const elDiffRk4 = document.getElementById('t2-diff-rk4');
+
+      const elExactV = document.getElementById('t2-val-exact-v');
+      const elExactY = document.getElementById('t2-val-exact-y');
+
+      const vEx = check2.exact.v;
+      const yEx = check2.exact.y;
+
+      if (elEulerV) elEulerV.textContent = `${formatNumber(check2.euler.v, 4, 4)} m/s`;
+      if (elEulerY) elEulerY.textContent = `${formatNumber(check2.euler.y, 4, 4)} m`;
+      if (elDiffEuler) {
+        const errY = check2.euler.y - yEx;
+        elDiffEuler.textContent = `Error en y: ${errY >= 0 ? '+' : ''}${formatNumber(errY, 4, 4)} m (Euler asume v₀=0 en todo el intervalo)`;
+      }
+
+      if (elHeunV) elHeunV.textContent = `${formatNumber(check2.heun.v, 4, 4)} m/s`;
+      if (elHeunY) elHeunY.textContent = `${formatNumber(check2.heun.y, 4, 4)} m`;
+      if (elDiffHeun) {
+        const errY = check2.heun.y - yEx;
+        elDiffHeun.textContent = `v(2) = ${formatNumber(check2.heun.v, 4, 4)} m/s y y(2) = ${formatNumber(check2.heun.y, 4, 4)} m (Error y: ${errY >= 0 ? '+' : ''}${formatNumber(errY, 4, 4)} m)`;
+      }
+
+      if (elRk4V) elRk4V.textContent = `${formatNumber(check2.rk4.v, 4, 4)} m/s`;
+      if (elRk4Y) elRk4Y.textContent = `${formatNumber(check2.rk4.y, 4, 4)} m`;
+      if (elDiffRk4) {
+        const errY = check2.rk4.y - yEx;
+        elDiffRk4.textContent = `v(2) ≈ ${formatNumber(check2.rk4.v, 4, 4)} m/s (Discrepancia menor a 0,002 m frente a la exacta)`;
+      }
+
+      if (elExactV) elExactV.textContent = `${formatNumber(vEx, 4, 4)} m/s`;
+      if (elExactY) elExactY.textContent = `${formatNumber(yEx, 4, 4)} m`;
+    }
+
+    // 3. Renderizar filas de la tabla comparativa multi-método
+    const tbody = document.getElementById('multi-method-table-body');
+    if (!tbody) return;
+
+    const rowsHtml = allData.rows.map((row) => {
+      return `
+        <tr>
+          <td class="col-step" style="font-weight: 700; text-align: center;">${formatNumber(row.t, 2, 2)}</td>
+          <td class="col-numeric col-euler" style="color: var(--sky-blue);">${formatNumber(row.euler.v, 4, 4)}</td>
+          <td class="col-numeric col-euler" style="color: var(--sky-blue);">${formatNumber(row.euler.y, 4, 4)}</td>
+          <td class="col-numeric col-heun" style="color: var(--mission-amber);">${formatNumber(row.heun.v, 4, 4)}</td>
+          <td class="col-numeric col-heun" style="color: var(--mission-amber);">${formatNumber(row.heun.y, 4, 4)}</td>
+          <td class="col-numeric col-rk4" style="color: #10b981; font-weight: 600;">${formatNumber(row.rk4.v, 4, 4)}</td>
+          <td class="col-numeric col-rk4" style="color: #10b981; font-weight: 600;">${formatNumber(row.rk4.y, 4, 4)}</td>
+          <td class="col-numeric col-exact" style="color: var(--mission-orange); font-weight: bold;">${formatNumber(row.exact.v, 4, 4)}</td>
+          <td class="col-numeric col-exact" style="color: var(--mission-orange); font-weight: bold;">${formatNumber(row.exact.y, 4, 4)}</td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = rowsHtml;
+
+    // 4. Aplicar filtro activo a la tabla
+    const tableEl = document.getElementById('multi-method-comparison-table');
+    if (tableEl) {
+      tableEl.classList.remove('filter-euler', 'filter-heun', 'filter-rk4', 'filter-all');
+      tableEl.classList.add(`filter-${activeMethodFilter}`);
+    }
+
+    // 5. Sincronizar botones de filtro
+    const filterButtons = document.querySelectorAll('.btn-method-tab');
+    filterButtons.forEach((btn) => {
+      const method = btn.getAttribute('data-method');
+      if (method === activeMethodFilter) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
   // =========================================================================
   // 6. CONTROLADORES DE EVENTOS Y VINCULACIÓN CON LA UI
   // =========================================================================
@@ -1206,6 +1318,18 @@ window.App = (function () {
         const val = parseFloat(card.getAttribute('data-h'));
         if (!isNaN(val) && val > 0) {
           setState({ h: val });
+        }
+      });
+    });
+
+    // 3c. Botones selectores de método en Sección 8 (Euler, Heun, RK4, Todos)
+    const methodTabs = document.querySelectorAll('.btn-method-tab');
+    methodTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const method = tab.getAttribute('data-method');
+        if (method) {
+          activeMethodFilter = method;
+          updateHeunRK4Section();
         }
       });
     });
@@ -1460,6 +1584,7 @@ window.App = (function () {
     syncUIWithState: syncUIWithState,
     updateEulerSection: updateEulerSection,
     updateAnalyticalSection: updateAnalyticalSection,
-    updatePrecisionSection: updatePrecisionSection
+    updatePrecisionSection: updatePrecisionSection,
+    updateHeunRK4Section: updateHeunRK4Section
   };
 })();

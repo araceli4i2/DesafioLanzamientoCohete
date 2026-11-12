@@ -1561,49 +1561,243 @@
   <section id="heun-rk4" class="section-wrapper">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Métodos de Orden Superior</span>
+        <span class="section-tag">Métodos de Orden Superior • Integración en Espacio de Estados</span>
         <h2 class="section-title">Métodos de Heun y Runge-Kutta 4 (RK4)</h2>
         <p class="section-subtitle">
-          Técnicas avanzadas de integración con múltiples muestras de pendiente para maximizar la exactitud en el ascenso.
+          Ampliación del sistema diferencial con el vector de estado $X = [y, v]^T$, manteniendo a Euler como método base y contrastando con técnicas de predictor-corrector (orden 2) y cuatro pendientes ponderadas (orden 4).
         </p>
       </div>
 
-      <div class="method-comparison-grid">
-        <!-- Método de Euler -->
-        <div class="method-card">
-          <span class="method-order-badge badge-euler">EULER — ORDEN 1</span>
-          <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">1 Pendiente</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); flex: 1;">
-            Toma la tangente en $t_n$. Rápido pero acumula error acumulativo $O(h)$.
-          </p>
-          <div class="mono" style="font-size: 0.8rem; color: var(--mission-orange);">Error: $O(h)$</div>
+      <!-- Panel 1: Comparativa Teórica y Formulación en Espacio de Estados X = [y, v] -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">SISTEMA EN ESPACIO DE ESTADOS: $X = [y, v]^T$ Y REGLAS DE RECURRENCIA</span>
+          <span class="method-order-badge badge-rk4">VECTOR X = [y, v]</span>
         </div>
 
-        <!-- Método de Heun -->
-        <div class="method-card">
-          <span class="method-order-badge badge-heun">HEUN — ORDEN 2</span>
-          <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">Predictor-Corrector</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); flex: 1;">
-            Promedia la pendiente al inicio y una predicción al final del intervalo.
-          </p>
-          <div class="mono" style="font-size: 0.8rem; color: var(--mission-amber);">Error: $O(h^2)$</div>
-        </div>
+        <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          El movimiento vertical acopla dos ecuaciones diferenciales de primer orden: $y' = v$ y $v' = \frac{T}{m} - g - \frac{k}{m}v$. Definiendo el vector de estado $X = \begin{bmatrix} y \\ v \end{bmatrix}$ y la función vectorial de pendientes $F(t, X) = \begin{bmatrix} v \\ \frac{T}{m} - g - \frac{k}{m}v \end{bmatrix}$, los tres métodos numéricos operan con los mismos parámetros físicos y el mismo paso $h$:
+        </p>
 
-        <!-- Método RK4 -->
-        <div class="method-card">
-          <span class="method-order-badge badge-rk4">RK4 — ORDEN 4</span>
-          <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">4 Pendientes Ponderadas</h3>
-          <p style="font-size: 0.85rem; color: var(--text-muted); flex: 1;">
-            Muestreo óptimo al inicio, dos en el punto medio y uno al final del paso.
-          </p>
-          <div class="mono" style="font-size: 0.8rem; color: var(--terminal-green);">Error: $O(h^4)$</div>
+        <div class="method-comparison-grid">
+          <!-- Método de Euler -->
+          <div class="method-card">
+            <span class="method-order-badge badge-euler">1. EULER (ORDEN 1)</span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">1 Pendiente Inicial</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+              Proyecta linealmente evaluando la razón de cambio solo al inicio del intervalo $t_n$:
+            </p>
+            <div class="equation-render" style="color: var(--sky-blue); font-size: 0.95rem; margin-bottom: 0.5rem;">
+              $$X_{n+1} = X_n + h \cdot F(t_n, X_n)$$
+            </div>
+            <div class="mono" style="font-size: 0.8rem; color: var(--mission-orange);">Error Global: $O(h)$</div>
+          </div>
+
+          <!-- Método de Heun -->
+          <div class="method-card">
+            <span class="method-order-badge badge-heun">2. HEUN (ORDEN 2)</span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">Predictor-Corrector</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+              Predice con Euler al final del paso y corrige promediando ambas pendientes:
+            </p>
+            <div class="equation-render" style="color: var(--mission-amber); font-size: 0.88rem; margin-bottom: 0.5rem;">
+              $$\begin{aligned}
+                k_1 &= F(t_n, X_n) \\
+                X_{\text{pred}} &= X_n + h \cdot k_1 \\
+                k_2 &= F(t_n + h, X_{\text{pred}}) \\
+                X_{n+1} &= X_n + \frac{h}{2}(k_1 + k_2)
+              \end{aligned}$$
+            </div>
+            <div class="mono" style="font-size: 0.8rem; color: var(--mission-amber);">Error Global: $O(h^2)$</div>
+          </div>
+
+          <!-- Método RK4 -->
+          <div class="method-card">
+            <span class="method-order-badge badge-rk4">3. RK4 (ORDEN 4)</span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-highlight);">4 Pendientes Ponderadas</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+              Cuadratura de Simpson generalizada: 1 al inicio, 2 al punto medio y 1 al final:
+            </p>
+            <div class="equation-render" style="color: #10b981; font-size: 0.85rem; margin-bottom: 0.5rem;">
+              $$\begin{aligned}
+                k_1 &= F(t_n, X_n) \\
+                k_2 &= F\left(t_n + \frac{h}{2}, X_n + \frac{h}{2}k_1\right) \\
+                k_3 &= F\left(t_n + \frac{h}{2}, X_n + \frac{h}{2}k_2\right) \\
+                k_4 &= F(t_n + h, X_n + h \cdot k_3) \\
+                X_{n+1} &= X_n + \frac{h}{6}(k_1 + 2k_2 + 2k_3 + k_4)
+              \end{aligned}$$
+            </div>
+            <div class="mono" style="font-size: 0.8rem; color: #10b981;">Error Global: $O(h^4)$</div>
+          </div>
         </div>
       </div>
 
-      <!-- Contenedor preparado para las fórmulas y tablas de Heun y RK4 -->
-      <div id="heun-rk4-container" class="code-container-stub" style="margin-top: 1.5rem;">
-        // Contenedor preparado: Enlace con las salidas numéricas de solveHeun y solveRK4 en numerical-methods.js
+      <!-- Panel 2: Comprobación Canónica a los 2 Segundos (h = 2 s) -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">COMPROBACIÓN CANÓNICA DE PRECISIÓN EN t = 2 s (PARÁMETROS ORIGINALES, h = 2 s)</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--electric-blue);">VERIFICACIÓN MATEMÁTICA</span>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Con las condiciones iniciales del desafío ($v(0) = 0$, $y(0) = 0$) y un paso temporal amplio ($h = 2\text{ s}$), se observa de forma contundente cómo los métodos de orden superior mitigan el error de discretización desde el primer intervalo:
+        </p>
+
+        <!-- Cuadrícula de 4 tarjetas de comprobación canónica en t = 2 s -->
+        <div class="canonical-test-grid">
+          <!-- Tarjeta Euler -->
+          <div class="canonical-test-card" style="border-left: 4px solid var(--sky-blue);">
+            <div class="canonical-card-header">
+              <span class="method-order-badge badge-euler">EULER (ORDEN 1)</span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #ef4444;">Error Alto</span>
+            </div>
+            <div class="canonical-card-body">
+              <div class="canonical-stat">
+                <span class="stat-lbl">Velocidad v(2 s):</span>
+                <span class="stat-val" id="t2-val-euler-v">10,3800 m/s</span>
+              </div>
+              <div class="canonical-stat">
+                <span class="stat-lbl">Altitud y(2 s):</span>
+                <span class="stat-val" id="t2-val-euler-y" style="color: #ef4444;">0,0000 m</span>
+              </div>
+              <div class="canonical-diff" id="t2-diff-euler">
+                Error en y: -9,7213 m (Euler asume v₀=0 en todo el intervalo)
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta Heun -->
+          <div class="canonical-test-card" style="border-left: 4px solid var(--mission-amber);">
+            <div class="canonical-card-header">
+              <span class="method-order-badge badge-heun">HEUN (ORDEN 2)</span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--mission-amber);">Predictor-Corrector</span>
+            </div>
+            <div class="canonical-card-body">
+              <div class="canonical-stat">
+                <span class="stat-lbl">Velocidad v(2 s):</span>
+                <span class="stat-val" id="t2-val-heun-v" style="color: var(--mission-amber);">9,3420 m/s</span>
+              </div>
+              <div class="canonical-stat">
+                <span class="stat-lbl">Altitud y(2 s):</span>
+                <span class="stat-val" id="t2-val-heun-y" style="color: var(--mission-amber);">10,3800 m</span>
+              </div>
+              <div class="canonical-diff" id="t2-diff-heun">
+                v(2) = 9,3420 m/s y y(2) = 10,3800 m (Promedio de 2 pendientes)
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta RK4 -->
+          <div class="canonical-test-card" style="border-left: 4px solid #10b981;">
+            <div class="canonical-card-header">
+              <span class="method-order-badge badge-rk4">RK4 (ORDEN 4)</span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #10b981;">Máxima Precisión</span>
+            </div>
+            <div class="canonical-card-body">
+              <div class="canonical-stat">
+                <span class="stat-lbl">Velocidad v(2 s):</span>
+                <span class="stat-val" id="t2-val-rk4-v" style="color: #10b981;">9,4077 m/s</span>
+              </div>
+              <div class="canonical-stat">
+                <span class="stat-lbl">Altitud y(2 s):</span>
+                <span class="stat-val" id="t2-val-rk4-y" style="color: #10b981;">9,7226 m</span>
+              </div>
+              <div class="canonical-diff" id="t2-diff-rk4">
+                v(2) ≈ 9,4076 m/s (Discrepancia menor a 0,0002 m/s frente a la exacta)
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta Exacta -->
+          <div class="canonical-test-card" style="border-left: 4px solid var(--mission-orange);">
+            <div class="canonical-card-header">
+              <span class="method-order-badge" style="background: rgba(255, 107, 53, 0.2); color: var(--mission-orange); border-color: rgba(255, 107, 53, 0.5);">EXACTA (REFERENCIA)</span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--mission-orange);">Solución Analítica</span>
+            </div>
+            <div class="canonical-card-body">
+              <div class="canonical-stat">
+                <span class="stat-lbl">Velocidad v(2 s):</span>
+                <span class="stat-val" id="t2-val-exact-v" style="color: var(--mission-orange);">9,4079 m/s</span>
+              </div>
+              <div class="canonical-stat">
+                <span class="stat-lbl">Altitud y(2 s):</span>
+                <span class="stat-val" id="t2-val-exact-y" style="color: var(--mission-orange);">9,7213 m</span>
+              </div>
+              <div class="canonical-diff">
+                v(2) = 51,9(1 - e^{-0,2}) ≈ 9,4079 m/s ; y(2) ≈ 9,7213 m
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Llamado pedagógico destacado -->
+        <div class="pedagogical-callout-box" style="margin-top: 1.5rem;">
+          <div class="callout-badge-header">
+            <span class="callout-icon">💡</span>
+            <span class="callout-title">LECCIÓN DE CONTROL DE VUELO: ¿POR QUÉ HEUN Y RK4 SON TAN SUPERIORES?</span>
+          </div>
+          <div class="callout-body-text">
+            <p>
+              La comprobación cuantitativa a los 2 segundos corrobora la regla de oro del cálculo numérico: <strong>Heun y RK4 quedan incomparablemente más cerca de la solución analítica que Euler</strong>. Mientras que Euler produce una altitud irreal de $0\text{ m}$ por asumir velocidad nula en todo el paso, Heun ($10,38\text{ m}$) y RK4 ($9,72\text{ m}$) muestrean la aceleración intermedia y proyectan la ganancia real de cota.
+            </p>
+            <p style="margin-top: 0.5rem;">
+              Para que esta convergencia se cumpla con exactitud, <strong>ambas variables del vector de estado $X = [y, v]^T$ deben actualizarse utilizando estrictamente los valores del paso anterior</strong>. Si se utilizara la velocidad recién corregida para calcular la posición dentro del mismo paso, el algoritmo se descalibraría violando el esquema formal de Runge-Kutta.
+            </p>
+          </div>
+        </div>
       </div>
+
+      <!-- Panel 3: Selector de Método y Tabla Comparativa Completa -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">TABLA COMPARATIVA MULTI-MÉTODO: TIEMPO | EULER (v, y) | HEUN (v, y) | RK4 (v, y) | ANALÍTICA (v, y)</span>
+          <span id="multi-method-table-step-info" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">
+            PASO ACTIVO: h = 2,00 s
+          </span>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Usa los botones para alternar la visualización entre métodos individuales o desplegar la comparativa integral completa:
+        </p>
+
+        <!-- Botonera selectora de método (Euler, Heun, RK4, Todos) -->
+        <div class="method-filter-bar">
+          <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim); margin-right: 0.5rem;">SELECCIONAR VISTA:</span>
+          <button type="button" class="btn-method-tab" data-method="euler">Euler</button>
+          <button type="button" class="btn-method-tab" data-method="heun">Heun</button>
+          <button type="button" class="btn-method-tab" data-method="rk4">RK4</button>
+          <button type="button" class="btn-method-tab active" data-method="all">Todos los Métodos</button>
+        </div>
+
+        <!-- Tabla comparativa responsiva -->
+        <div class="table-responsive-wrapper">
+          <table class="nasa-dynamic-table filter-all" id="multi-method-comparison-table">
+            <thead>
+              <tr>
+                <th rowspan="2" style="vertical-align: middle; width: 75px; text-align: center;">Tiempo (s)</th>
+                <th colspan="2" class="th-method-group col-euler" style="text-align: center; color: var(--sky-blue); border-bottom: 1px solid rgba(56, 189, 248, 0.3);">Euler</th>
+                <th colspan="2" class="th-method-group col-heun" style="text-align: center; color: var(--mission-amber); border-bottom: 1px solid rgba(245, 158, 11, 0.3);">Heun</th>
+                <th colspan="2" class="th-method-group col-rk4" style="text-align: center; color: #10b981; border-bottom: 1px solid rgba(16, 185, 129, 0.3);">RK4</th>
+                <th colspan="2" class="th-method-group col-exact" style="text-align: center; color: var(--mission-orange); border-bottom: 1px solid rgba(255, 107, 53, 0.3);">Analítica Exacta</th>
+              </tr>
+              <tr>
+                <th class="col-euler" style="color: var(--sky-blue);">v (m/s)</th>
+                <th class="col-euler" style="color: var(--sky-blue);">y (m)</th>
+                <th class="col-heun" style="color: var(--mission-amber);">v (m/s)</th>
+                <th class="col-heun" style="color: var(--mission-amber);">y (m)</th>
+                <th class="col-rk4" style="color: #10b981);">v (m/s)</th>
+                <th class="col-rk4" style="color: #10b981);">y (m)</th>
+                <th class="col-exact" style="color: var(--mission-orange);">v (m/s)</th>
+                <th class="col-exact" style="color: var(--mission-orange);">y (m)</th>
+              </tr>
+            </thead>
+            <tbody id="multi-method-table-body">
+              <!-- Inyectado dinámicamente por app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </section>
 
