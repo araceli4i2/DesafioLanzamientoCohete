@@ -1807,47 +1807,186 @@
   <section id="graficas-errores" class="section-wrapper">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Telemetría Comparativa</span>
-        <h2 class="section-title">Gráficas de Trayectoria, Velocidad y Error</h2>
+        <span class="section-tag">Telemetría Gráfica y Convergencia</span>
+        <h2 class="section-title">Gráficas de Dinámica, Cinemática y Errores</h2>
         <p class="section-subtitle">
-          Superposición de la Solución Analítica, Euler, Heun y RK4 para validar la convergencia.
+          Superposición de la Solución Analítica continua frente a los métodos numéricos discretos de Euler, Heun y Runge-Kutta 4 (RK4).
         </p>
       </div>
 
-      <div class="charts-grid">
-        <!-- Gráfica de Altitud y(t) -->
-        <div class="chart-card">
-          <div class="panel-header-bar">
-            <span class="panel-title-text">TRAYECTORIA VERTICAL: $y(t)$</span>
-            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">[m vs s]</span>
+      <!-- Panel de Controles Interactivos -->
+      <div class="chart-controls-panel">
+        <div class="chart-controls-row">
+          <!-- Toggles de visibilidad de métodos -->
+          <div class="chart-toggles-group">
+            <span class="chart-toggles-label">Métodos:</span>
+            <label class="method-toggle-chip toggle-analytical active" id="chip-analytical">
+              <input type="checkbox" id="toggle-method-analytical" checked>
+              <span>Analítica Exacta</span>
+            </label>
+            <label class="method-toggle-chip toggle-euler active" id="chip-euler">
+              <input type="checkbox" id="toggle-method-euler" checked>
+              <span>Euler (1º orden)</span>
+            </label>
+            <label class="method-toggle-chip toggle-heun active" id="chip-heun">
+              <input type="checkbox" id="toggle-method-heun" checked>
+              <span>Heun (2º orden)</span>
+            </label>
+            <label class="method-toggle-chip toggle-rk4 active" id="chip-rk4">
+              <input type="checkbox" id="toggle-method-rk4" checked>
+              <span>RK4 (4º orden)</span>
+            </label>
           </div>
-          <div class="chart-canvas-wrapper">
-            <canvas id="chart-trajectory"></canvas>
+
+          <!-- Parámetros reactivos de simulación -->
+          <div class="chart-params-inline-group">
+            <div class="chart-inline-field">
+              <label for="input-chart-h">Paso $h$ (s):</label>
+              <input type="number" id="input-chart-h" class="chart-inline-input" step="0.25" min="0.05" max="10" value="2.00">
+              <div class="chart-step-btns">
+                <button type="button" class="btn-chart-h active" data-h="2.0">2 s</button>
+                <button type="button" class="btn-chart-h" data-h="1.0">1 s</button>
+                <button type="button" class="btn-chart-h" data-h="0.5">0,5 s</button>
+                <button type="button" class="btn-chart-h" data-h="0.25">0,25 s</button>
+              </div>
+            </div>
+
+            <div class="chart-inline-field">
+              <label for="input-chart-tFinal">Tiempo $t_f$ (s):</label>
+              <input type="number" id="input-chart-tFinal" class="chart-inline-input" step="5" min="5" max="100" value="20">
+            </div>
+
+            <button type="button" id="btn-chart-reset-view" class="btn-secondary-euler" style="padding: 0.35rem 0.85rem; font-size: 0.78rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Valores Canónicos
+            </button>
           </div>
         </div>
+      </div>
 
-        <!-- Gráfica de Velocidad v(t) -->
+      <!-- Tarjetas de Telemetría Numérica (6 tarjetas) -->
+      <div class="chart-metrics-deck">
+        <!-- 1. Velocidad Final -->
+        <div class="chart-metric-box">
+          <span class="metric-box-title">Velocidad Final $v(t_f)$</span>
+          <span id="metric-chart-v-final" class="metric-box-value highlight-cyan">44,88 m/s</span>
+          <span id="metric-chart-v-final-sub" class="metric-box-sub">Analítica exacta en $t = 20\text{ s}$</span>
+        </div>
+
+        <!-- 2. Altura Final -->
+        <div class="chart-metric-box">
+          <span class="metric-box-title">Altura Final $y(t_f)$</span>
+          <span id="metric-chart-y-final" class="metric-box-value highlight-cyan">589,24 m</span>
+          <span id="metric-chart-y-final-sub" class="metric-box-sub">Analítica exacta en $t = 20\text{ s}$</span>
+        </div>
+
+        <!-- 3. Error Máximo -->
+        <div class="chart-metric-box">
+          <span class="metric-box-title">Error Máximo Global</span>
+          <span id="metric-chart-max-error" class="metric-box-value highlight-orange">20,86 m</span>
+          <span id="metric-chart-max-error-sub" class="metric-box-sub">Desviación máxima registrada (Euler)</span>
+        </div>
+
+        <!-- 4. Error Final -->
+        <div class="chart-metric-box">
+          <span class="metric-box-title">Error Final $e(t_f)$</span>
+          <span id="metric-chart-final-error" class="metric-box-value highlight-orange">1,45 m/s</span>
+          <span id="metric-chart-final-error-sub" class="metric-box-sub">Euler: $1,45\text{ m/s}$ | RK4: $0,0002\text{ m/s}$</span>
+        </div>
+
+        <!-- 5. Método Más Preciso -->
+        <div class="chart-metric-box">
+          <span class="metric-box-title">Método Más Preciso</span>
+          <span id="metric-chart-best-method" class="metric-box-value highlight-green">Runge-Kutta 4</span>
+          <span id="metric-chart-best-method-sub" class="metric-box-sub">Error residual $< 0,001\text{ m/s}$ ($O(h^4)$)</span>
+        </div>
+
+        <!-- 6. Número de Iteraciones -->
+        <div class="chart-metric-box">
+          <span class="metric-box-title">Iteraciones</span>
+          <span id="metric-chart-iterations" class="metric-box-value">10 pasos</span>
+          <span id="metric-chart-iterations-sub" class="metric-box-sub">$N = t_f / h$ con paso $h = 2,00\text{ s}$</span>
+        </div>
+      </div>
+
+      <!-- Cuadrícula de 4 Gráficas Independientes -->
+      <div class="charts-quad-grid">
+        <!-- Gráfica 1: Velocidad vs Tiempo -->
         <div class="chart-card">
-          <div class="panel-header-bar">
-            <span class="panel-title-text">VELOCIDAD ASCENDENTE: $v(t)$</span>
-            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--electric-blue);">[m/s vs s]</span>
+          <div class="chart-card-header">
+            <span class="chart-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--electric-blue)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              1. Velocidad vs Tiempo: $v(t)$
+            </span>
+            <span class="chart-card-badge">[m/s vs s]</span>
           </div>
           <div class="chart-canvas-wrapper">
             <canvas id="chart-velocity"></canvas>
           </div>
         </div>
+
+        <!-- Gráfica 2: Altura vs Tiempo -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <span class="chart-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sky-blue)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              2. Altura vs Tiempo: $y(t)$
+            </span>
+            <span class="chart-card-badge">[m vs s]</span>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="chart-altitude"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfica 3: Error Absoluto de Velocidad -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <span class="chart-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mission-orange)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              3. Error Absoluto de Velocidad
+            </span>
+            <span class="chart-card-badge" style="color: var(--mission-orange); border-color: rgba(255,107,0,0.3);">|v_exact - v_num| [m/s]</span>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="chart-error-v"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfica 4: Error Absoluto de Altura -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <span class="chart-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mission-orange)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              4. Error Absoluto de Altura
+            </span>
+            <span class="chart-card-badge" style="color: var(--mission-orange); border-color: rgba(255,107,0,0.3);">|y_exact - y_num| [m]</span>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="chart-error-y"></canvas>
+          </div>
+        </div>
       </div>
 
-      <!-- Gráfica de Comparación de Error Global -->
-      <div class="chart-card" style="margin-top: 2rem;">
-        <div class="panel-header-bar">
-          <span class="panel-title-text">ERROR ABSOLUTO GLOBAL RESPECTO A LA SOLUCIÓN ANALÍTICA</span>
-          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--mission-orange);">|y_num - y_exact|</span>
+      <!-- Paneles de Observación Didáctica e Interpretación Científica -->
+      <div class="chart-analysis-deck">
+        <!-- Observación de Euler (Condicionada) -->
+        <div id="euler-over-under-observation" class="euler-observation-callout">
+          <!-- Inyectado dinámicamente según se verifique la condición en el estado -->
         </div>
-        <div class="chart-canvas-wrapper" style="height: 260px;">
-          <canvas id="chart-errors"></canvas>
+
+        <!-- Interpretación Automática -->
+        <div class="chart-auto-interpretation-box">
+          <div class="auto-interp-header">
+            <span class="auto-interp-badge">Telemetría Evaluada</span>
+            <h4 class="auto-interp-title">Interpretación Automática de Resultados Numéricos</h4>
+          </div>
+          <div id="charts-auto-interpretation" class="auto-interp-body">
+            <!-- Inyectado dinámicamente por app.js -->
+          </div>
         </div>
       </div>
+
     </div>
   </section>
 

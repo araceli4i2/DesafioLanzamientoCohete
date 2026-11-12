@@ -311,11 +311,12 @@ window.App = (function () {
     updateForcesDiagramSVG();
     updateDynamicSubstitutedEDO();
 
-    // Actualizar la Sección 5 (Euler), Sección 6 (Analítica), Sección 7 (Precisión) y Sección 8 (Heun/RK4)
+    // Actualizar la Sección 5 (Euler), Sección 6 (Analítica), Sección 7 (Precisión), Sección 8 (Heun/RK4) y Sección 9 (Gráficas)
     if (validation.isValid) {
       updateEulerSection();
       updatePrecisionSection();
       updateHeunRK4Section();
+      updateChartsSection();
     }
 
     // Re-renderizado reactivo continuo de MathJax tras cada actualización
@@ -342,7 +343,8 @@ window.App = (function () {
           document.getElementById('euler-steps-container'),
           document.getElementById('solucion-analitica'),
           document.getElementById('desafio-precision'),
-          document.getElementById('heun-rk4')
+          document.getElementById('heun-rk4'),
+          document.getElementById('graficas-errores')
         ].filter(Boolean);
 
         if (window.MathJax.typesetClear && dynamicTargets.length > 0) {
@@ -1265,6 +1267,139 @@ window.App = (function () {
   }
 
   // =========================================================================
+  // 5.5 SECCIÓN 9: GRÁFICAS Y ANÁLISIS DE ERROR (CHART.JS)
+  // =========================================================================
+
+  /**
+   * Actualiza la sección 9 (Gráficas y Errores):
+   * 1. Sincroniza inputs y botones de paso inline (h, tFinal).
+   * 2. Delega en ChartsManager.updateAllCharts(state) para renderizar las 4 gráficas independientes.
+   * 3. Actualiza las 6 tarjetas de telemetría numérica con valores calculados.
+   * 4. Evalúa la condición física de Euler y genera la observación pedagógica.
+   * 5. Genera la interpretación automática delimitada a este modelo y parámetros.
+   */
+  function updateChartsSection() {
+    if (!window.ChartsManager) return;
+
+    // 1. Sincronizar controles inline de la sección de gráficas
+    const inputChartH = document.getElementById('input-chart-h');
+    const inputChartTf = document.getElementById('input-chart-tFinal');
+
+    if (inputChartH && document.activeElement !== inputChartH) {
+      inputChartH.value = state.h;
+    }
+    if (inputChartTf && document.activeElement !== inputChartTf) {
+      inputChartTf.value = state.tFinal;
+    }
+
+    // Botones rápidos de paso h en la barra de gráficas
+    const chartStepBtns = document.querySelectorAll('.btn-chart-h');
+    chartStepBtns.forEach((btn) => {
+      const btnH = parseFloat(btn.getAttribute('data-h'));
+      if (Math.abs(btnH - state.h) < 1e-4) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // 2. Renderizar o actualizar las 4 gráficas independientes vía ChartsManager
+    const metrics = window.ChartsManager.updateAllCharts(state);
+    if (!metrics) return;
+
+    // 3. Actualizar las 6 tarjetas métricas
+    const elVFinal = document.getElementById('metric-chart-v-final');
+    const elVFinalSub = document.getElementById('metric-chart-v-final-sub');
+    const elYFinal = document.getElementById('metric-chart-y-final');
+    const elYFinalSub = document.getElementById('metric-chart-y-final-sub');
+    const elMaxErr = document.getElementById('metric-chart-max-error');
+    const elMaxErrSub = document.getElementById('metric-chart-max-error-sub');
+    const elFinErr = document.getElementById('metric-chart-final-error');
+    const elFinErrSub = document.getElementById('metric-chart-final-error-sub');
+    const elBest = document.getElementById('metric-chart-best-method');
+    const elBestSub = document.getElementById('metric-chart-best-method-sub');
+    const elIter = document.getElementById('metric-chart-iterations');
+    const elIterSub = document.getElementById('metric-chart-iterations-sub');
+
+    if (elVFinal) elVFinal.textContent = `${formatNumber(metrics.vFinalExact, 2, 2)} m/s`;
+    if (elVFinalSub) elVFinalSub.textContent = `Exacta en t = ${formatNumber(metrics.tFinal, 0, 0)} s (Euler: ${formatNumber(metrics.euler.v, 2, 2)} m/s)`;
+
+    if (elYFinal) elYFinal.textContent = `${formatNumber(metrics.yFinalExact, 2, 2)} m`;
+    if (elYFinalSub) elYFinalSub.textContent = `Exacta en t = ${formatNumber(metrics.tFinal, 0, 0)} s (Euler: ${formatNumber(metrics.euler.y, 2, 2)} m)`;
+
+    if (elMaxErr) elMaxErr.textContent = `${formatNumber(metrics.maxErrorY, 2, 4)} m`;
+    if (elMaxErrSub) elMaxErrSub.textContent = `Máxima desviación de altitud registrada (${metrics.maxErrorMethod})`;
+
+    if (elFinErr) elFinErr.textContent = `${formatNumber(metrics.euler.errV, 2, 4)} m/s`;
+    if (elFinErrSub) elFinErrSub.textContent = `Euler: ${formatNumber(metrics.euler.errV, 2, 4)} m/s | RK4: ${formatNumber(metrics.rk4.errV, 4, 6)} m/s`;
+
+    if (elBest) elBest.textContent = metrics.bestMethodName;
+    if (elBestSub) elBestSub.textContent = `Error residual en v: ${formatNumber(metrics.bestErrV, 4, 6)} m/s (${metrics.bestMethodOrder})`;
+
+    if (elIter) elIter.textContent = `${metrics.iterationsCount} pasos`;
+    if (elIterSub) elIterSub.textContent = `N = ${metrics.iterationsCount} con h = ${formatNumber(metrics.h, 2, 2)} s`;
+
+    // 4. Observación pedagógica condicionada sobre el Método de Euler
+    const eulerCond = window.ChartsManager.evaluateEulerOverUnderCondition(state);
+    const eulerObsBox = document.getElementById('euler-over-under-observation');
+
+    if (eulerObsBox) {
+      if (eulerCond.isFullyConfirmed) {
+        eulerObsBox.innerHTML = `
+          <div class="euler-obs-header">
+            <span class="euler-obs-badge">PROPIEDAD NUMÉRICA VERIFICADA</span>
+            <h4 class="euler-obs-title">Observación Pedagógica: Comportamiento Asimétrico de Euler</h4>
+          </div>
+          <div class="euler-obs-body">
+            <p>
+              <strong>Euler sobreestima la velocidad</strong> (usa la pendiente de aceleración al inicio del intervalo, cuando el empuje neto es máximo antes de crecer la resistencia) y <strong>subestima la altura</strong> (usa la velocidad al inicio del intervalo, cuando el vehículo aún no ha acelerado).
+            </p>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #cbd5e1;">
+              <em>Verificación cuantitativa con los parámetros actuales:</em> En los <strong>${eulerCond.totalPoints} pasos</strong> evaluados ($t > 0$), se cumple sin excepción que $v_{\\text{Euler}}(t) > v_{\\text{exacta}}(t)$ (desviación final de $+${formatNumber(metrics.euler.errV, 2, 4)}\\text{ m/s}$) e $y_{\\text{Euler}}(t) < y_{\\text{exacta}}(t)$ (desviación final de $-${formatNumber(metrics.euler.errY, 2, 4)}\\text{ m}$).
+            </p>
+          </div>
+        `;
+      } else {
+        eulerObsBox.innerHTML = `
+          <div class="euler-obs-header">
+            <span class="euler-obs-badge" style="background: rgba(245, 158, 11, 0.2); color: var(--mission-amber); border-color: rgba(245, 158, 11, 0.5);">COMPORTAMIENTO BAJO PARÁMETROS ALTERADOS</span>
+            <h4 class="euler-obs-title">Comportamiento Dinámico del Método de Euler</h4>
+          </div>
+          <div class="euler-obs-body">
+            <p>
+              Con la configuración actual de parámetros, la derivada de aceleración o el perfil de velocidad se han modificado respecto al régimen de ascenso estándar: Euler sobreestima la velocidad en <strong>${eulerCond.countOverV} de ${eulerCond.totalPoints}</strong> instantes y subestima la altura en <strong>${eulerCond.countUnderY} de ${eulerCond.totalPoints}</strong> instantes.
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    // 5. Interpretación automática contextualizada (sin universalizar superioridad)
+    const interpContainer = document.getElementById('charts-auto-interpretation');
+    if (interpContainer) {
+      interpContainer.innerHTML = `
+        <p>
+          Para el modelo propulsor lineal analizado ($m = ${formatNumber(state.m, 0, 0)}\\text{ kg}$, $T = ${formatNumber(state.T, 0, 0)}\\text{ N}$, $k = ${formatNumber(state.k, 0, 1)}\\text{ kg/s}$) en el intervalo $t \\in [0, ${formatNumber(state.tFinal, 0, 0)}]\\text{ s}$ con paso $h = ${formatNumber(state.h, 2, 2)}\\text{ s}$:
+        </p>
+        <ul style="margin: 0.5rem 0 0.85rem 1.25rem; line-height: 1.65;">
+          <li>
+            <strong style="color: #10B981;">${metrics.bestMethodName}:</strong> Registra la menor discrepancia global con la solución analítica, alcanzando un error final en velocidad de $|e_v| = ${formatNumber(metrics.rk4.errV, 4, 6)}\\text{ m/s}$ y en altura de $|e_y| = ${formatNumber(metrics.rk4.errY, 4, 6)}\\text{ m}$. Su error de truncamiento local $O(h^5)$ amortigua notablemente la curvatura no lineal.
+          </li>
+          <li>
+            <strong style="color: #FBBF24;">Método de Heun (2º orden):</strong> El mecanismo predictor-corrector promedia las pendientes en los extremos de cada subintervalo, reduciendo el error a $|e_v| = ${formatNumber(metrics.heun.errV, 4, 4)}\\text{ m/s}$ y $|e_y| = ${formatNumber(metrics.heun.errY, 2, 4)}\\text{ m}$ (más de un orden de magnitud inferior a Euler).
+          </li>
+          <li>
+            <strong style="color: #FF8F3D;">Método de Euler (1er orden):</strong> Acumula el mayor error por discretización, con $|e_v| = ${formatNumber(metrics.euler.errV, 2, 4)}\\text{ m/s}$ y $|e_y| = ${formatNumber(metrics.euler.errY, 2, 4)}\\text{ m}$.
+          </li>
+        </ul>
+        <div class="epistemological-disclaimer">
+          <strong>Delimitación metodológica estricta:</strong> Esta conclusión comparativa se limita rigurosamente a este modelo físico con los parámetros y paso evaluados. En el análisis numérico computacional, ningún método es universalmente superior bajo cualquier circunstancia: algoritmos de orden elevado como RK4 requieren 4 evaluaciones de la función derivada por paso frente a 1 sola en Euler; además, ante sistemas rígidos (stiff) o discontinuidades físicas (como el cese abrupto de empuje por agotamiento de combustible), métodos implícitos o esquemas multipaso con control adaptativo resultan más idóneos.
+        </div>
+      `;
+    }
+  }
+
+  // =========================================================================
   // 6. CONTROLADORES DE EVENTOS Y VINCULACIÓN CON LA UI
   // =========================================================================
 
@@ -1333,6 +1468,91 @@ window.App = (function () {
         }
       });
     });
+
+    // 3d. Controles interactivos de la Sección 9 (Gráficas y Errores)
+    const methodToggleKeys = [
+      { id: 'toggle-method-analytical', chip: 'chip-analytical', key: 'analytical' },
+      { id: 'toggle-method-euler', chip: 'chip-euler', key: 'euler' },
+      { id: 'toggle-method-heun', chip: 'chip-heun', key: 'heun' },
+      { id: 'toggle-method-rk4', chip: 'chip-rk4', key: 'rk4' }
+    ];
+
+    methodToggleKeys.forEach(({ id, chip, key }) => {
+      const toggleEl = document.getElementById(id);
+      const chipEl = document.getElementById(chip);
+      if (toggleEl) {
+        toggleEl.addEventListener('change', (e) => {
+          const isChecked = e.target.checked;
+          if (chipEl) {
+            if (isChecked) {
+              chipEl.classList.add('active');
+            } else {
+              chipEl.classList.remove('active');
+            }
+          }
+          if (window.ChartsManager) {
+            window.ChartsManager.setMethodVisibility(key, isChecked, state);
+          }
+        });
+      }
+    });
+
+    // Input inline de paso h en la barra de gráficas
+    const inputChartH = document.getElementById('input-chart-h');
+    if (inputChartH) {
+      inputChartH.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (!isNaN(val) && val > 0) {
+          setState({ h: val });
+        }
+      });
+    }
+
+    // Botones rápidos de paso h en la barra de gráficas
+    const chartStepBtns = document.querySelectorAll('.btn-chart-h');
+    chartStepBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = parseFloat(btn.getAttribute('data-h'));
+        if (!isNaN(val) && val > 0) {
+          setState({ h: val });
+        }
+      });
+    });
+
+    // Input inline de tiempo final tFinal en la barra de gráficas
+    const inputChartTf = document.getElementById('input-chart-tFinal');
+    if (inputChartTf) {
+      inputChartTf.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (!isNaN(val) && val > 0) {
+          setState({ tFinal: val });
+        }
+      });
+    }
+
+    // Botón de restablecimiento de vista a parámetros canónicos
+    const btnChartResetView = document.getElementById('btn-chart-reset-view');
+    if (btnChartResetView) {
+      btnChartResetView.addEventListener('click', () => {
+        setState({
+          m: 1000.0,
+          T: 15000.0,
+          g: 9.81,
+          k: 100.0,
+          v0: 0.0,
+          y0: 0.0,
+          tFinal: 20.0,
+          h: 2.0
+        });
+        methodToggleKeys.forEach(({ id, chip, key }) => {
+          const toggleEl = document.getElementById(id);
+          const chipEl = document.getElementById(chip);
+          if (toggleEl) toggleEl.checked = true;
+          if (chipEl) chipEl.classList.add('active');
+          if (window.ChartsManager) window.ChartsManager.setMethodVisibility(key, true);
+        });
+      });
+    }
 
     // 4. Botones de acción de la Sección 5 (Euler)
     const btnEulerCalc = document.getElementById('btn-euler-calculate');
@@ -1585,6 +1805,7 @@ window.App = (function () {
     updateEulerSection: updateEulerSection,
     updateAnalyticalSection: updateAnalyticalSection,
     updatePrecisionSection: updatePrecisionSection,
-    updateHeunRK4Section: updateHeunRK4Section
+    updateHeunRK4Section: updateHeunRK4Section,
+    updateChartsSection: updateChartsSection
   };
 })();
