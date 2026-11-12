@@ -587,6 +587,70 @@ window.NumericalMethods = (function () {
     return results;
   }
 
+  /**
+   * Obtiene los datos estructurados para el Desafío de Precisión (Sección 7):
+   * Para los 4 pasos representativos [2, 1, 0.5, 0.25], calcula:
+   * - Número dinámico de iteraciones: Math.round(tFinal / h)
+   * - Velocidad y altura a tFinal con Euler y con la solución analítica
+   * - Errores absolutos en velocidad y altura
+   * - Verificación de los dos requisitos de tolerancia:
+   *     1. Error de velocidad < 0,5 m/s
+   *     2. Error de altura < 5 m
+   * - Estado global (Precisión alcanzada vs Insuficiente)
+   * 
+   * @param {Object} params - Parámetros { m, T, g, k, v0, y0, tFinal, h }
+   * @param {number} [activeH] - Paso actualmente seleccionado
+   * @returns {Object} { stepsData, activeStep, vExact, yExact, tFinal }
+   */
+  function getPrecisionChallengeData(params, activeH) {
+    const p = params || {};
+    const tFinal = (p.tFinal !== undefined && p.tFinal > 0) ? p.tFinal : 20.0;
+    const stepSizes = [2.0, 1.0, 0.5, 0.25];
+    const currentH = (activeH !== undefined) ? activeH : (p.h || 2.0);
+
+    const vExact = window.Mathematics ? window.Mathematics.velocidadExacta(tFinal, p) : 44.8761;
+    const yExact = window.Mathematics ? window.Mathematics.alturaExacta(tFinal, p) : 589.2390;
+
+    const stepsData = stepSizes.map((hVal) => {
+      const iterations = Math.round(tFinal / hVal);
+      const series = solveEuler(Object.assign({}, p, { h: hVal, tFinal: tFinal }));
+      const last = series[series.length - 1] || { v: 0, y: 0 };
+
+      const vEuler = last.v;
+      const yEuler = last.y;
+      const errV = Math.abs(vEuler - vExact);
+      const errY = Math.abs(yEuler - yExact);
+
+      // Requisitos de tolerancia de Katherine Johnson
+      const passV = errV < 0.5;
+      const passY = errY < 5.0;
+      const allPass = passV && passY;
+
+      return {
+        h: hVal,
+        iterations: iterations,
+        vEuler: vEuler,
+        yEuler: yEuler,
+        errV: errV,
+        errY: errY,
+        passV: passV,
+        passY: passY,
+        allPass: allPass,
+        isActive: Math.abs(hVal - currentH) < 1e-4
+      };
+    });
+
+    const activeStep = stepsData.find(s => s.isActive) || stepsData[0];
+
+    return {
+      tFinal: tFinal,
+      vExact: vExact,
+      yExact: yExact,
+      stepsData: stepsData,
+      activeStep: activeStep
+    };
+  }
+
   // API pública expuesta
   return {
     evalAcceleration: evalAcceleration,
@@ -598,6 +662,7 @@ window.NumericalMethods = (function () {
     solveHeun: solveHeun,
     solveRK4: solveRK4,
     calculateErrors: calculateErrors,
-    analyzeConvergence: analyzeConvergence
+    analyzeConvergence: analyzeConvergence,
+    getPrecisionChallengeData: getPrecisionChallengeData
   };
 })();

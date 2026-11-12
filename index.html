@@ -1359,52 +1359,199 @@
   <section id="desafio-precision" class="section-wrapper">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Sensibilidad y Estabilidad</span>
+        <span class="section-tag">Sensibilidad y Estabilidad • Criterio Katherine Johnson</span>
         <h2 class="section-title">El Desafío de la Precisión Numérica</h2>
         <p class="section-subtitle">
-          Evaluación del impacto del paso temporal $h$ en la convergencia del método de Euler y verificación de Katherine Johnson.
+          Evaluación del impacto del paso temporal $h$ en la convergencia del método de Euler, verificación rigurosa de tolerancias de vuelo y análisis del error global de primer orden $O(h)$.
         </p>
       </div>
 
-      <div class="console-panel">
+      <!-- Panel 1: Selector de Paso Temporal Interactivo y Conteo Dinámico de Iteraciones -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
         <div class="panel-header-bar">
-          <span class="panel-title-text">SELECTOR DE PASO TEMPORAL ($h$)</span>
-          <span class="panel-status-led"></span>
+          <span class="panel-title-text">SELECTOR DE PASO TEMPORAL ($h$) Y HORIZONTE DE INTEGRACIÓN</span>
+          <span id="precision-horizon-badge" class="method-order-badge badge-euler">TIEMPO FINAL: 20 s</span>
         </div>
 
-        <p>
-          Para el desafío de lanzamiento, analizaremos el comportamiento y acumulación del error de truncamiento evaluando cuatro tamaños de paso representativos:
+        <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Para un tiempo final de vuelo de $20\text{ s}$ ($t_f = 20\text{ s}$), el número total de iteraciones requeridas por el método se calcula dinámicamente mediante $N = \lceil t_f / h \rceil$. Selecciona uno de los 4 pasos para evaluar la precisión del vehículo:
         </p>
 
-        <!-- Selector visual de paso h -->
-        <div class="step-selector-group" style="margin: 1.5rem 0;">
-          <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-dim); margin-right: 0.75rem;">SELECCIONAR PASO $h$:</span>
-          <button type="button" class="step-selector-btn active" data-h="2">h = 2 s (Base)</button>
-          <button type="button" class="step-selector-btn" data-h="1">h = 1 s</button>
-          <button type="button" class="step-selector-btn" data-h="0.5">h = 0,5 s</button>
-          <button type="button" class="step-selector-btn" data-h="0.25">h = 0,25 s</button>
-        </div>
+        <!-- Grid de 4 opciones interactivas con cálculo dinámico de iteraciones -->
+        <div class="precision-step-grid" id="precision-step-selector-deck">
+          <button type="button" class="precision-step-card active" data-h="2">
+            <div class="precision-step-header">
+              <span class="precision-step-val">h = 2 s</span>
+              <span class="precision-step-badge badge-base">Paso Base</span>
+            </div>
+            <div class="precision-step-iter" id="precision-iter-2">10 iteraciones</div>
+            <div class="precision-step-sub">Intervalo grueso • Δt = 2,00 s</div>
+          </button>
 
-        <ul class="problem-list">
-          <li>
-            <span class="bullet-icon">●</span>
-            <div><strong>Paso $h = 2\text{ s}$ (10 pasos en 20 s):</strong> Produce la mayor discrepancia en altitud y velocidad final debido a la aproximación lineal gruesa.</div>
-          </li>
-          <li>
-            <span class="bullet-icon">●</span>
-            <div><strong>Paso $h = 1\text{ s}$ (20 pasos):</strong> Reduce el error de truncamiento local aproximadamente a la mitad.</div>
-          </li>
-          <li>
-            <span class="bullet-icon">●</span>
-            <div><strong>Paso $h = 0,5\text{ s}$ (40 pasos) y $h = 0,25\text{ s}$ (80 pasos):</strong> Convergencia continua hacia la trayectoria analítica exacta $y(t) = 51,9t - 519(1 - e^{-0,1t})$.</div>
-          </li>
-        </ul>
+          <button type="button" class="precision-step-card" data-h="1">
+            <div class="precision-step-header">
+              <span class="precision-step-val">h = 1 s</span>
+              <span class="precision-step-badge badge-medium">2× Pasos</span>
+            </div>
+            <div class="precision-step-iter" id="precision-iter-1">20 iteraciones</div>
+            <div class="precision-step-sub">Intervalo medio • Δt = 1,00 s</div>
+          </button>
 
-        <!-- Contenedor preparado para experimentos de precisión -->
-        <div id="precision-challenge-container" class="code-container-stub">
-          // Contenedor preparado: En la fase de cálculo se vinculará la tabla comparativa de error global vs paso h.
+          <button type="button" class="precision-step-card" data-h="0.5">
+            <div class="precision-step-header">
+              <span class="precision-step-val">h = 0,5 s</span>
+              <span class="precision-step-badge badge-fine">4× Pasos</span>
+            </div>
+            <div class="precision-step-iter" id="precision-iter-05">40 iteraciones</div>
+            <div class="precision-step-sub">Intervalo fino • Δt = 0,50 s</div>
+          </button>
+
+          <button type="button" class="precision-step-card" data-h="0.25">
+            <div class="precision-step-header">
+              <span class="precision-step-val">h = 0,25 s</span>
+              <span class="precision-step-badge badge-ultrafine">8× Pasos</span>
+            </div>
+            <div class="precision-step-iter" id="precision-iter-025">80 iteraciones</div>
+            <div class="precision-step-sub">Alta resolución • Δt = 0,25 s</div>
+          </button>
         </div>
       </div>
+
+      <!-- Panel 2: Tarjetas de Resultados a los 20 s y Criterios de Tolerancia (Katherine Johnson) -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">MONITOR DE TOLERANCIAS DE VUELO — CRITERIO KATHERINE JOHNSON (t = 20 s)</span>
+          <span id="precision-active-step-label" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--electric-blue);">
+            EVALUANDO PASO ACTIVO: h = 2,00 s
+          </span>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Contraste directo entre el método numérico de Euler y la solución analítica exacta a los 20 segundos de simulación:
+        </p>
+
+        <!-- Tarjetas con Velocidad y Altura a los 20 s -->
+        <div class="challenge-q1-grid" style="margin-bottom: 1.5rem;">
+          <!-- Tarjeta de Velocidad a 20 s -->
+          <div class="q1-metric-card">
+            <div class="q1-card-label">Velocidad a t = 20 s (Euler vs. Exacta)</div>
+            <div class="q1-card-value" id="precision-val-v20" style="color: var(--electric-blue);">
+              46,3273 <span class="q1-card-unit">m/s</span>
+            </div>
+            <div class="q1-card-sub" id="precision-sub-v20">
+              Exacta: 44,8761 m/s (Error: 1,4512 m/s)
+            </div>
+          </div>
+
+          <!-- Tarjeta de Altura a 20 s -->
+          <div class="q1-metric-card highlight-metric">
+            <div class="q1-card-label">Altitud a t = 20 s (Euler vs. Exacta)</div>
+            <div class="q1-card-value" id="precision-val-y20" style="color: var(--mission-orange);">
+              574,7272 <span class="q1-card-unit">m</span>
+            </div>
+            <div class="q1-card-sub" id="precision-sub-y20">
+              Exacta: 589,2390 m (Error: 14,5118 m)
+            </div>
+          </div>
+        </div>
+
+        <!-- Dos Indicadores de Requisito de Katherine Johnson -->
+        <div class="precision-reqs-grid">
+          <!-- Indicador 1: Error de Velocidad < 0.5 m/s -->
+          <div class="precision-req-box" id="req-box-v">
+            <div class="req-box-header">
+              <span class="req-title">1. REQUISITO DE VELOCIDAD</span>
+              <span class="req-target">Objetivo: Error &lt; 0,5 m/s</span>
+            </div>
+            <div class="req-indicator-row">
+              <div class="req-badge-circle req-fail" id="req-v-badge">✘</div>
+              <div class="req-info">
+                <div class="req-value-text" id="req-v-value">Error: 1,4512 m/s</div>
+                <div class="req-status-text" id="req-v-status">Tolerancia no alcanzada (≥ 0,5 m/s)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicador 2: Error de Altura < 5 m -->
+          <div class="precision-req-box" id="req-box-y">
+            <div class="req-box-header">
+              <span class="req-title">2. REQUISITO DE ALTITUD</span>
+              <span class="req-target">Objetivo: Error &lt; 5 m</span>
+            </div>
+            <div class="req-indicator-row">
+              <div class="req-badge-circle req-fail" id="req-y-badge">✘</div>
+              <div class="req-info">
+                <div class="req-value-text" id="req-y-value">Error: 14,5118 m</div>
+                <div class="req-status-text" id="req-y-status">Tolerancia no alcanzada (≥ 5 m)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner de Dictamen Global del Desafío -->
+        <div id="precision-verdict-banner" class="precision-banner banner-warning" style="margin-top: 1.5rem;">
+          <div class="banner-icon-box" id="precision-verdict-icon">⚠️</div>
+          <div class="banner-text-box">
+            <h4 id="precision-verdict-title">La precisión todavía es insuficiente. Prueba un paso menor</h4>
+            <p id="precision-verdict-desc">
+              Con el paso actual ($h = 2,00\text{ s}$), las desviaciones acumuladas exceden las tolerancias máximas admitidas por el control de vuelo para garantizar una trayectoria balística segura.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Tabla de Convergencia Numérica -->
+      <div class="console-panel" style="margin-bottom: 2rem;">
+        <div class="panel-header-bar">
+          <span class="panel-title-text">TABLA DE CONVERGENCIA GLOBAL (EVALUACIÓN EN t = 20 s)</span>
+          <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sky-blue);">
+            ANÁLISIS DE ERROR VS. TAMAÑO DE PASO
+          </span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Comportamiento del error absoluto en velocidad y altura al refinar progresivamente el paso de integración:
+        </p>
+
+        <div class="table-responsive-wrapper">
+          <table class="nasa-dynamic-table" id="precision-convergence-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">h</th>
+                <th>Velocidad (m/s)</th>
+                <th style="color: var(--electric-blue);">Error velocidad (m/s)</th>
+                <th>Altura (m)</th>
+                <th style="color: var(--mission-orange);">Error altura (m)</th>
+                <th style="text-align: right;">Estado Requisitos</th>
+              </tr>
+            </thead>
+            <tbody id="precision-convergence-table-body">
+              <!-- Inyectado dinámicamente por app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Comentario Pedagógico Destacado: Convergencia de Primer Orden -->
+        <div class="pedagogical-callout-box" style="margin-top: 1.5rem;">
+          <div class="callout-badge-header">
+            <span class="callout-icon">📌</span>
+            <span class="callout-title">LECCIÓN DE ANÁLISIS NUMÉRICO: REDUCCIÓN DEL ERROR A LA MITAD</span>
+          </div>
+          <div class="callout-body-text">
+            <p>
+              Al observar la tabla de convergencia se aprecia un patrón matemático inequívoco: <strong>al dividir $h$ entre 2 el error se reduce aproximadamente a la mitad</strong>.
+            </p>
+            <ul style="margin: 0.75rem 0 0.75rem 1.25rem; font-size: 0.92rem; color: #cbd5e1;">
+              <li>De $h = 2\text{ s}$ a $h = 1\text{ s}$: el error en velocidad baja de $1,4512\text{ m/s}$ a $0,7141\text{ m/s}$ ($\approx 50,8\%$), y en altura de $14,5118\text{ m}$ a $7,1407\text{ m}$ ($\approx 50,8\%$).</li>
+              <li>De $h = 1\text{ s}$ a $h = 0,5\text{ s}$: el error en velocidad desciende a $0,3541\text{ m/s}$ y en altura a $3,5412\text{ m}$ ($\approx 50,4\%$).</li>
+              <li>De $h = 0,5\text{ s}$ a $h = 0,25\text{ s}$: el error en velocidad cae a $0,1763\text{ m/s}$ y en altura a $1,7633\text{ m}$ ($\approx 50,2\%$).</li>
+            </ul>
+            <p style="margin-top: 0.75rem;">
+              <strong>Importante:</strong> Esta conclusión <strong>se limita a este problema y al método de Euler</strong>, pues Euler es un algoritmo de <strong>primer orden ($O(h)$)</strong> cuyo error global acumulado es linealmente proporcional al paso temporal ($E_{\text{global}} \approx C \cdot h$). Por tanto, $E(h/2) \approx \frac{1}{2} E(h)$. En métodos numéricos de orden superior —como Heun ($O(h^2)$) o Runge-Kutta 4 ($O(h^4)$)—, dividir el paso a la mitad produce reducciones cuánticas de error por factores de 4 y 16 respectivamente.
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 

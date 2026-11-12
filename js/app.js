@@ -311,9 +311,10 @@ window.App = (function () {
     updateForcesDiagramSVG();
     updateDynamicSubstitutedEDO();
 
-    // Actualizar la Sección 5 (Método de Euler)
+    // Actualizar la Sección 5 (Método de Euler), Sección 6 (Analítica) y Sección 7 (Precisión)
     if (validation.isValid) {
       updateEulerSection();
+      updatePrecisionSection();
     }
 
     // Re-renderizado reactivo continuo de MathJax tras cada actualización
@@ -338,7 +339,8 @@ window.App = (function () {
           document.getElementById('dynamic-substituted-edo'),
           document.getElementById('euler-liftoff-warning'),
           document.getElementById('euler-steps-container'),
-          document.getElementById('solucion-analitica')
+          document.getElementById('solucion-analitica'),
+          document.getElementById('desafio-precision')
         ].filter(Boolean);
 
         if (window.MathJax.typesetClear && dynamicTargets.length > 0) {
@@ -964,6 +966,192 @@ window.App = (function () {
     tbody.innerHTML = rowsHtml;
   }
 
+  /**
+   * Actualiza la Sección 7: Desafío de Precisión Numérica y Convergencia.
+   * - Calcula iteraciones dinámicamente: Math.round(tFinal / h)
+   * - Evalúa a t = 20 s con Euler y solución analítica
+   * - Actualiza tarjetas con velocidad y altura a los 20 s
+   * - Verifica los 2 requisitos de tolerancia (Katherine Johnson):
+   *     1. Error de velocidad < 0,5 m/s
+   *     2. Error de altura < 5 m
+   * - Muestra mensaje condicional ("La precisión todavía es insuficiente. Prueba un paso menor" vs "Precisión alcanzada")
+   * - Renderiza la tabla de convergencia para h = 2, 1, 0,5, 0,25 más fila Exacta
+   * 
+   * @param {number} [customH] - Paso de integración a evaluar (opcional, usa state.h)
+   */
+  function updatePrecisionSection(customH) {
+    if (!window.NumericalMethods || typeof window.NumericalMethods.getPrecisionChallengeData !== 'function') {
+      return;
+    }
+
+    const currentH = (customH !== undefined) ? customH : state.h;
+    const data = window.NumericalMethods.getPrecisionChallengeData(state, currentH);
+    if (!data) return;
+
+    const tFinal = data.tFinal;
+    const vExact = data.vExact;
+    const yExact = data.yExact;
+    const stepsData = data.stepsData;
+    const activeStep = data.activeStep;
+
+    // 1. Actualizar horizonte en badge
+    const horizonBadge = document.getElementById('precision-horizon-badge');
+    if (horizonBadge) {
+      horizonBadge.textContent = `TIEMPO FINAL: ${formatNumber(tFinal, 0, 0)} s`;
+    }
+
+    // 2. Actualizar tarjetas selectoras de paso e iteraciones dinámicas
+    const stepCards = document.querySelectorAll('.precision-step-card');
+    stepCards.forEach((card) => {
+      const cardH = parseFloat(card.getAttribute('data-h'));
+      const isActive = Math.abs(cardH - activeStep.h) < 1e-4;
+      if (isActive) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+
+      // Conteo dinámico de iteraciones: Math.round(tFinal / cardH)
+      const iters = Math.round(tFinal / cardH);
+      const iterEl = card.querySelector('.precision-step-iter');
+      if (iterEl) {
+        iterEl.textContent = `${iters} iteraciones`;
+      }
+    });
+
+    // 3. Etiqueta de paso activo
+    const activeStepLabel = document.getElementById('precision-active-step-label');
+    if (activeStepLabel) {
+      activeStepLabel.textContent = `EVALUANDO PASO ACTIVO: h = ${formatNumber(activeStep.h, 2, 2)} s`;
+    }
+
+    // 4. Tarjetas de resultados a los 20 s (Euler vs Exacta)
+    const elV20 = document.getElementById('precision-val-v20');
+    const subV20 = document.getElementById('precision-sub-v20');
+    const elY20 = document.getElementById('precision-val-y20');
+    const subY20 = document.getElementById('precision-sub-y20');
+
+    if (elV20) {
+      elV20.innerHTML = `${formatNumber(activeStep.vEuler, 4, 4)} <span class="q1-card-unit">m/s</span>`;
+    }
+    if (subV20) {
+      subV20.textContent = `Exacta: ${formatNumber(vExact, 4, 4)} m/s (Error: ${formatNumber(activeStep.errV, 4, 4)} m/s)`;
+    }
+
+    if (elY20) {
+      elY20.innerHTML = `${formatNumber(activeStep.yEuler, 4, 4)} <span class="q1-card-unit">m</span>`;
+    }
+    if (subY20) {
+      subY20.textContent = `Exacta: ${formatNumber(yExact, 4, 4)} m (Error: ${formatNumber(activeStep.errY, 4, 4)} m)`;
+    }
+
+    // 5. Dos indicadores de requisito de Katherine Johnson
+    const badgeV = document.getElementById('req-v-badge');
+    const valV = document.getElementById('req-v-value');
+    const statusV = document.getElementById('req-v-status');
+
+    if (badgeV && valV && statusV) {
+      if (activeStep.passV) {
+        badgeV.textContent = '✔';
+        badgeV.className = 'req-badge-circle req-pass';
+        statusV.textContent = '✔ Tolerancia alcanzada (< 0,5 m/s)';
+        statusV.style.color = '#10b981';
+      } else {
+        badgeV.textContent = '✘';
+        badgeV.className = 'req-badge-circle req-fail';
+        statusV.textContent = '✘ Tolerancia superada (≥ 0,5 m/s)';
+        statusV.style.color = '#ef4444';
+      }
+      valV.textContent = `Error: ${formatNumber(activeStep.errV, 4, 4)} m/s`;
+    }
+
+    const badgeY = document.getElementById('req-y-badge');
+    const valY = document.getElementById('req-y-value');
+    const statusY = document.getElementById('req-y-status');
+
+    if (badgeY && valY && statusY) {
+      if (activeStep.passY) {
+        badgeY.textContent = '✔';
+        badgeY.className = 'req-badge-circle req-pass';
+        statusY.textContent = '✔ Tolerancia alcanzada (< 5 m)';
+        statusY.style.color = '#10b981';
+      } else {
+        badgeY.textContent = '✘';
+        badgeY.className = 'req-badge-circle req-fail';
+        statusY.textContent = '✘ Tolerancia superada (≥ 5 m)';
+        statusY.style.color = '#ef4444';
+      }
+      valY.textContent = `Error: ${formatNumber(activeStep.errY, 4, 4)} m`;
+    }
+
+    // 6. Banner de Dictamen Global del Desafío
+    const banner = document.getElementById('precision-verdict-banner');
+    const bannerIcon = document.getElementById('precision-verdict-icon');
+    const bannerTitle = document.getElementById('precision-verdict-title');
+    const bannerDesc = document.getElementById('precision-verdict-desc');
+
+    if (banner && bannerTitle) {
+      if (activeStep.allPass) {
+        banner.className = 'precision-banner banner-success';
+        if (bannerIcon) bannerIcon.textContent = '🚀';
+        bannerTitle.textContent = 'Precisión alcanzada';
+        if (bannerDesc) {
+          bannerDesc.textContent = `Los dos requisitos de Katherine Johnson se han cumplido: Error en velocidad (${formatNumber(activeStep.errV, 4, 4)} m/s < 0,5 m/s) y error en altitud (${formatNumber(activeStep.errY, 4, 4)} m < 5 m). La trayectoria es apta para la verificación de vuelo.`;
+        }
+      } else {
+        banner.className = 'precision-banner banner-warning';
+        if (bannerIcon) bannerIcon.textContent = '⚠️';
+        bannerTitle.textContent = 'La precisión todavía es insuficiente. Prueba un paso menor';
+        if (bannerDesc) {
+          const failReasons = [];
+          if (!activeStep.passV) failReasons.push(`velocidad (${formatNumber(activeStep.errV, 4, 4)} m/s ≥ 0,5 m/s)`);
+          if (!activeStep.passY) failReasons.push(`altitud (${formatNumber(activeStep.errY, 4, 4)} m ≥ 5 m)`);
+          bannerDesc.textContent = `Con h = ${formatNumber(activeStep.h, 2, 2)} s las desviaciones en ${failReasons.join(' y ')} impiden validar la trayectoria para el programa Mercury.`;
+        }
+      }
+    }
+
+    // 7. Tabla de convergencia global
+    const tbody = document.getElementById('precision-convergence-table-body');
+    if (!tbody) return;
+
+    let rowsHtml = stepsData.map((s) => {
+      const isActive = Math.abs(s.h - activeStep.h) < 1e-4;
+      const activeClass = isActive ? ' class="row-active-step"' : '';
+      const badgeClass = s.allPass ? 'status-nominal' : 'status-ascent';
+      const badgeText = s.allPass ? '✔ Cumplido' : '✘ Insuficiente';
+
+      return `
+        <tr${activeClass}>
+          <td class="col-step" style="font-weight: 700;">${formatNumber(s.h, 2, 2)} s</td>
+          <td class="col-numeric">${formatNumber(s.vEuler, 4, 4)}</td>
+          <td class="col-numeric" style="color: var(--electric-blue); font-weight: 600;">${formatNumber(s.errV, 4, 4)}</td>
+          <td class="col-numeric">${formatNumber(s.yEuler, 4, 4)}</td>
+          <td class="col-numeric" style="color: var(--mission-orange); font-weight: 600;">${formatNumber(s.errY, 4, 4)}</td>
+          <td class="col-numeric" style="text-align: right;">
+            <span class="flight-status-badge ${badgeClass}">${badgeText}</span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Fila Exacta
+    rowsHtml += `
+      <tr style="background: rgba(14, 165, 233, 0.08); font-weight: bold;">
+        <td class="col-step" style="color: var(--sky-blue); font-weight: 700;">Exacta</td>
+        <td class="col-numeric" style="color: var(--sky-blue);">${formatNumber(vExact, 4, 4)}</td>
+        <td class="col-numeric" style="color: var(--text-dim);">0,0000</td>
+        <td class="col-numeric" style="color: var(--sky-blue);">${formatNumber(yExact, 4, 4)}</td>
+        <td class="col-numeric" style="color: var(--text-dim);">0,0000</td>
+        <td class="col-numeric" style="text-align: right;">
+          <span class="flight-status-badge badge-status-end">Referencia</span>
+        </td>
+      </tr>
+    `;
+
+    tbody.innerHTML = rowsHtml;
+  }
+
   // =========================================================================
   // 6. CONTROLADORES DE EVENTOS Y VINCULACIÓN CON LA UI
   // =========================================================================
@@ -1005,6 +1193,17 @@ window.App = (function () {
     stepButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const val = parseFloat(btn.getAttribute('data-h'));
+        if (!isNaN(val) && val > 0) {
+          setState({ h: val });
+        }
+      });
+    });
+
+    // 3b. Selectores de paso del Desafío de Precisión (Sección 7)
+    const precisionCards = document.querySelectorAll('.precision-step-card');
+    precisionCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const val = parseFloat(card.getAttribute('data-h'));
         if (!isNaN(val) && val > 0) {
           setState({ h: val });
         }
@@ -1260,6 +1459,7 @@ window.App = (function () {
     validateParameters: validateParameters,
     syncUIWithState: syncUIWithState,
     updateEulerSection: updateEulerSection,
-    updateAnalyticalSection: updateAnalyticalSection
+    updateAnalyticalSection: updateAnalyticalSection,
+    updatePrecisionSection: updatePrecisionSection
   };
 })();
