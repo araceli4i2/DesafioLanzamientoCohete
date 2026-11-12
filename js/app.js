@@ -311,12 +311,16 @@ window.App = (function () {
     updateForcesDiagramSVG();
     updateDynamicSubstitutedEDO();
 
-    // Actualizar la Sección 5 (Euler), Sección 6 (Analítica), Sección 7 (Precisión), Sección 8 (Heun/RK4) y Sección 9 (Gráficas)
+    // Actualizar la Sección 5 (Euler), Sección 6 (Analítica), Sección 7 (Precisión), Sección 8 (Heun/RK4), Sección 9 (Gráficas) y Sección 10 (Simulador)
     if (validation.isValid) {
       updateEulerSection();
       updatePrecisionSection();
       updateHeunRK4Section();
       updateChartsSection();
+
+      if (window.Simulation && typeof window.Simulation.syncWithState === 'function') {
+        window.Simulation.syncWithState(state);
+      }
     }
 
     // Re-renderizado reactivo continuo de MathJax tras cada actualización
@@ -344,7 +348,8 @@ window.App = (function () {
           document.getElementById('solucion-analitica'),
           document.getElementById('desafio-precision'),
           document.getElementById('heun-rk4'),
-          document.getElementById('graficas-errores')
+          document.getElementById('graficas-errores'),
+          document.getElementById('simulador-lanzamiento')
         ].filter(Boolean);
 
         if (window.MathJax.typesetClear && dynamicTargets.length > 0) {
@@ -1637,34 +1642,7 @@ window.App = (function () {
       });
     }
 
-    // 7. Botones de control del simulador (Lanzar, Pausar, Reiniciar)
-    const btnLaunch = document.getElementById('btn-sim-launch');
-    const btnPause = document.getElementById('btn-sim-pause');
-    const btnReset = document.getElementById('btn-sim-reset');
-
-    if (btnLaunch) {
-      btnLaunch.addEventListener('click', () => {
-        if (window.Simulation) {
-          window.Simulation.startSimulation();
-        }
-      });
-    }
-
-    if (btnPause) {
-      btnPause.addEventListener('click', () => {
-        if (window.Simulation) {
-          window.Simulation.pauseSimulation();
-        }
-      });
-    }
-
-    if (btnReset) {
-      btnReset.addEventListener('click', () => {
-        if (window.Simulation) {
-          window.Simulation.resetSimulation();
-        }
-      });
-    }
+    // 7. Botones de control del simulador: gestionados y vinculados en Simulation.initSimulationSVG
 
     // 8. Menú móvil
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');

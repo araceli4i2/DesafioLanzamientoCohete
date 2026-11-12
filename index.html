@@ -2056,6 +2056,19 @@
             <input type="number" id="input-tFinal" class="param-input" value="20" step="1" min="5" max="100">
           </div>
 
+          <!-- Selector de Método Numérico para el Vuelo -->
+          <div class="param-input-group" style="margin-top: 1.25rem;">
+            <label class="param-input-label">
+              <span>Algoritmo de Vuelo:</span>
+            </label>
+            <div class="sim-method-selector-deck">
+              <button type="button" class="btn-sim-method active" data-method="euler">Euler (1º)</button>
+              <button type="button" class="btn-sim-method" data-method="heun">Heun (2º)</button>
+              <button type="button" class="btn-sim-method" data-method="rk4">RK4 (4º)</button>
+              <button type="button" class="btn-sim-method" data-method="analytical">Exacta</button>
+            </div>
+          </div>
+
           <div class="param-input-group" style="display: none;">
             <input type="number" id="input-v0" value="0">
             <input type="number" id="input-y0" value="0">
@@ -2064,37 +2077,216 @@
 
         <!-- Panel Central: Contenedor SVG de la Simulación y Controles de Vuelo -->
         <main class="viewport-deck">
+          <!-- Cabecera del Visor con Distintivo de Interpolación Suave Obligatorio -->
+          <div class="viewport-header-bar">
+            <div class="viewport-title-box">
+              <span class="status-dot-green"></span>
+              <span class="viewport-title-text">VISOR BALÍSTICO SVG — TELEMETRÍA 1962</span>
+            </div>
+            <div class="interpolation-badge">
+              <span class="badge-dot-cyan"></span>
+              <span>Interpolación visual entre pasos; no es un cálculo nuevo</span>
+            </div>
+          </div>
+
+          <!-- Banner de Aviso Didáctico: Error de Discretización de Euler en t in [0, 2 s] -->
+          <div id="sim-euler-zero-warning" class="sim-euler-alert-box" style="display: none;">
+            <div class="euler-alert-icon">⚠</div>
+            <div class="euler-alert-text">
+              <strong>Aviso Didáctico:</strong> El cohete permanece en $y = 0\text{ m}$ durante los primeros $2\text{ s}$ debido exclusivamente al error de discretización del Método de Euler ($y_1 = y_0 + h \cdot v_0 = 0 + 2 \cdot 0 = 0\text{ m}$), y no a falta de empuje.
+            </div>
+          </div>
+
+          <!-- Contenedor del Visor SVG Vectorial Vertical -->
           <div id="rocket-svg-container" class="simulation-svg-wrapper">
-            <svg id="rocket-svg" viewBox="0 0 600 480" class="simulation-svg" xmlns="http://www.w3.org/2000/svg">
-              <!-- Fondo de atmósfera y espacio (preparado para renderizado en fase 9) -->
-              <rect width="600" height="480" fill="url(#skyGradientStub)" />
-              <line x1="0" y1="450" x2="600" y2="450" stroke="#38bdf8" stroke-width="2" />
-              <!-- Plataforma de lanzamiento esquemática en reposo -->
-              <rect x="250" y="440" width="100" height="15" fill="#1e293b" stroke="#38bdf8" />
-              <!-- Cohete esquemático SVG preparado en pad -->
-              <g id="svg-rocket-group" transform="translate(290, 370)">
-                <rect x="5" y="10" width="10" height="50" fill="#f8fafc" stroke="#94a3b8" />
-                <polygon points="5,10 15,10 10,0" fill="#ef4444" />
-                <polygon points="0,55 5,45 5,60" fill="#475569" />
-                <polygon points="20,55 15,45 15,60" fill="#475569" />
-              </g>
-              <text x="300" y="240" text-anchor="middle" fill="rgba(56, 189, 248, 0.4)" font-family="'Share Tech Mono'" font-size="14">
-                VISOR VECTORIAL SVG — EN ESPERA DE LANZAMIENTO (FASE 9)
-              </text>
+            <svg id="rocket-svg" viewBox="0 0 540 600" class="simulation-svg" xmlns="http://www.w3.org/2000/svg">
               <defs>
-                <linearGradient id="skyGradientStub" x1="0%" y1="0%" x2="0%" y2="100%">
+                <!-- Gradiente de atmósfera a espacio -->
+                <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                   <stop offset="0%" stop-color="#020617" />
-                  <stop offset="60%" stop-color="#081a3e" />
-                  <stop offset="100%" stop-color="#152238" />
+                  <stop offset="35%" stop-color="#071b3b" />
+                  <stop offset="70%" stop-color="#0c2d64" />
+                  <stop offset="90%" stop-color="#1e4976" />
+                  <stop offset="100%" stop-color="#2a5c8a" />
+                </linearGradient>
+                
+                <!-- Gradiente de suelo y pad -->
+                <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#1e293b" />
+                  <stop offset="100%" stop-color="#0f172a" />
+                </linearGradient>
+
+                <!-- Gradiente de llama propulsora exterior -->
+                <linearGradient id="flameOuterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ffedd5" />
+                  <stop offset="30%" stop-color="#ff7a00" />
+                  <stop offset="70%" stop-color="#e11d48" />
+                  <stop offset="100%" stop-color="rgba(225, 29, 72, 0)" />
+                </linearGradient>
+
+                <!-- Gradiente de llama interior blanca/amarilla -->
+                <linearGradient id="flameInnerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" />
+                  <stop offset="40%" stop-color="#fef08a" />
+                  <stop offset="85%" stop-color="#f59e0b" />
+                  <stop offset="100%" stop-color="rgba(245, 158, 11, 0)" />
                 </linearGradient>
               </defs>
+
+              <!-- 1. Fondo Atmosférico -->
+              <rect width="540" height="600" fill="url(#skyGrad)" />
+
+              <!-- 2. Estrellas en el espacio superior -->
+              <g id="svg-stars" opacity="0.8">
+                <circle cx="90" cy="30" r="1" fill="#fff" />
+                <circle cx="150" cy="50" r="1.5" fill="#38bdf8" />
+                <circle cx="210" cy="25" r="0.8" fill="#fff" />
+                <circle cx="280" cy="40" r="1.2" fill="#fff" />
+                <circle cx="360" cy="20" r="1.5" fill="#00e5ff" />
+                <circle cx="430" cy="45" r="1" fill="#fff" />
+                <circle cx="490" cy="35" r="0.8" fill="#fff" />
+                <circle cx="120" cy="80" r="1" fill="#fff" />
+                <circle cx="390" cy="75" r="1.2" fill="#fff" />
+                <circle cx="470" cy="90" r="1" fill="#fff" />
+              </g>
+
+              <!-- 3. Nubes atmosféricas a diferentes cotas -->
+              <g id="svg-clouds" opacity="0.32">
+                <path d="M 340 180 q 20 -20 40 0 q 30 -10 45 15 q 20 0 25 15 q -10 15 -30 15 h -75 q -15 0 -15 -15 q 0 -15 10 -15 z" fill="#94a3b8" />
+                <path d="M 80 300 q 25 -25 50 0 q 35 -15 55 18 q 20 0 25 18 q -15 18 -35 18 h -90 q -15 0 -15 -18 q 0 -18 10 -18 z" fill="#cbd5e1" />
+                <path d="M 380 430 q 30 -20 60 0 q 40 -15 65 15 q 20 0 25 20 h -145 q -15 0 -15 -18 q 0 -17 10 -17 z" fill="#e2e8f0" />
+              </g>
+
+              <!-- 4. Escala de Altura Vertical (Regla graduada en el lado izquierdo) -->
+              <g id="svg-altitude-ruler">
+                <line x1="60" y1="70" x2="60" y2="520" stroke="rgba(56, 189, 248, 0.35)" stroke-width="2" stroke-dasharray="4 4" />
+                
+                <!-- 100% (Apex) -->
+                <line x1="50" y1="70" x2="65" y2="70" stroke="#00e5ff" stroke-width="2" />
+                <text id="ruler-lbl-100" x="45" y="74" text-anchor="end" fill="#00e5ff" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">600m</text>
+                
+                <!-- 75% -->
+                <line x1="53" y1="182" x2="63" y2="182" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5" />
+                <text id="ruler-lbl-75" x="48" y="186" text-anchor="end" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="9">450m</text>
+                
+                <!-- 50% -->
+                <line x1="50" y1="295" x2="65" y2="295" stroke="rgba(56, 189, 248, 0.6)" stroke-width="1.5" />
+                <text id="ruler-lbl-50" x="45" y="299" text-anchor="end" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="bold">300m</text>
+                
+                <!-- 25% -->
+                <line x1="53" y1="407" x2="63" y2="407" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5" />
+                <text id="ruler-lbl-25" x="48" y="411" text-anchor="end" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="9">150m</text>
+                
+                <!-- 0% (Pad) -->
+                <line x1="50" y1="520" x2="65" y2="520" stroke="#10b981" stroke-width="2" />
+                <text id="ruler-lbl-0" x="45" y="524" text-anchor="end" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="bold">0m</text>
+
+                <!-- Cursor móvil de altitud -->
+                <g id="svg-alt-cursor" transform="translate(62, 520)">
+                  <polygon points="0,0 8,-5 8,5" fill="#00e5ff" />
+                  <rect x="9" y="-9" width="55" height="18" rx="2" fill="rgba(6, 14, 32, 0.9)" stroke="#00e5ff" stroke-width="1" />
+                  <text id="cursor-alt-text" x="36" y="3" text-anchor="middle" fill="#00e5ff" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="bold">0m</text>
+                </g>
+              </g>
+
+              <!-- 5. Plataforma de Lanzamiento y Torre LC-14 -->
+              <g id="svg-ground-and-pad">
+                <rect x="0" y="520" width="540" height="80" fill="url(#groundGrad)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1" />
+                <line x1="0" y1="520" x2="540" y2="520" stroke="#38bdf8" stroke-width="1.5" opacity="0.6" />
+
+                <!-- Flame Trench -->
+                <polygon points="260,520 280,555 340,555 360,520" fill="#090d16" stroke="#475569" stroke-width="1.5" />
+                <line x1="280" y1="555" x2="250" y2="600" stroke="#334155" stroke-width="2" />
+                <line x1="340" y1="555" x2="370" y2="600" stroke="#334155" stroke-width="2" />
+
+                <!-- Mesa de lanzamiento -->
+                <rect x="275" y="515" width="70" height="8" rx="1" fill="#475569" stroke="#94a3b8" stroke-width="1" />
+                <rect x="285" y="523" width="10" height="12" fill="#334155" />
+                <rect x="325" y="523" width="10" height="12" fill="#334155" />
+
+                <!-- Torre de Servicio de la NASA (Lattice Tower) -->
+                <g id="svg-gantry-tower" opacity="0.95">
+                  <rect x="235" y="330" width="18" height="190" fill="#7f1d1d" stroke="#ef4444" stroke-width="1" />
+                  <rect x="235" y="360" width="18" height="30" fill="#f8fafc" />
+                  <rect x="235" y="420" width="18" height="30" fill="#f8fafc" />
+                  <rect x="235" y="480" width="18" height="30" fill="#f8fafc" />
+                  <path d="M 235 330 L 253 360 M 253 330 L 235 360 M 235 360 L 253 390 M 253 360 L 235 390 M 235 390 L 253 420 M 253 390 L 235 420 M 235 420 L 253 450 M 253 420 L 235 450 M 235 450 L 253 480 M 253 450 L 235 480 M 235 480 L 253 510 M 253 480 L 235 510" stroke="#1e293b" stroke-width="1.5" />
+                  <polygon id="svg-umbilical-arm" points="253,380 295,380 295,386 253,386" fill="#f59e0b" stroke="#b45309" stroke-width="1" />
+                  <line x1="253" y1="380" x2="285" y2="368" stroke="#f59e0b" stroke-width="1.5" />
+                  <circle cx="244" cy="326" r="3" fill="#ef4444">
+                    <animate attributeName="opacity" values="1;0.2;1" dur="1s" repeatCount="indefinite" />
+                  </circle>
+                </g>
+              </g>
+
+              <!-- 6. Humo Volumétrico en Despegue -->
+              <g id="svg-smoke-group" opacity="0">
+                <ellipse id="smoke-1" cx="310" cy="525" rx="35" ry="15" fill="#cbd5e1" opacity="0.6" />
+                <ellipse id="smoke-2" cx="270" cy="535" rx="45" ry="18" fill="#94a3b8" opacity="0.5" />
+                <ellipse id="smoke-3" cx="350" cy="535" rx="45" ry="18" fill="#94a3b8" opacity="0.5" />
+              </g>
+
+              <!-- 7. Cohete y Llamas Propulsoras -->
+              <g id="svg-rocket-group" transform="translate(310, 520)">
+                <!-- Llamas del Motor -->
+                <g id="svg-thruster-flame" opacity="0">
+                  <polygon id="flame-outer" points="-10,0 0,55 10,0" fill="url(#flameOuterGrad)" />
+                  <polygon id="flame-inner" points="-5,0 0,35 5,0" fill="url(#flameInnerGrad)" />
+                  <circle cx="0" cy="15" r="14" fill="rgba(255, 107, 0, 0.4)" filter="blur(2px)" />
+                </g>
+
+                <!-- Tobera de escape -->
+                <polygon points="-6,0 6,0 4,-10 -4,-10" fill="#334155" stroke="#64748b" stroke-width="1" />
+                
+                <!-- Aletas estabilizadoras -->
+                <polygon points="-10,-10 -24,-2 -24,-22 -10,-24" fill="#1e293b" stroke="#00e5ff" stroke-width="1" />
+                <polygon points="10,-10 24,-2 24,-22 10,-24" fill="#1e293b" stroke="#00e5ff" stroke-width="1" />
+
+                <!-- Fuselaje cilíndrico con patrón de rodadura Mercury -->
+                <rect x="-10" y="-70" width="20" height="60" rx="2" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2" />
+                <rect x="-10" y="-55" width="20" height="12" fill="#0f172a" />
+                <rect x="-10" y="-35" width="20" height="4" fill="#ff6b00" />
+                <line x1="-5" y1="-22" x2="5" y2="-22" stroke="#ef4444" stroke-width="1.5" />
+
+                <!-- Cápsula Mercury / Ojiva cónica -->
+                <polygon points="-10,-70 10,-70 0,-92" fill="#0f172a" stroke="#475569" stroke-width="1" />
+                <circle cx="0" cy="-76" r="2.5" fill="#38bdf8" />
+
+                <!-- Torre de escape aerodinámica -->
+                <line x1="0" y1="-92" x2="0" y2="-106" stroke="#ef4444" stroke-width="1.5" />
+                <polygon points="-3,-106 3,-106 0,-112" fill="#ef4444" />
+              </g>
             </svg>
           </div>
           
+          <!-- Barra de Controles de Vuelo -->
           <div class="simulator-controls-bar">
-            <button id="btn-sim-launch" class="btn-ctrl btn-launch">▲ LANZAR COHETE</button>
-            <button id="btn-sim-pause" class="btn-ctrl btn-pause">⏸ PAUSAR</button>
-            <button id="btn-sim-reset" class="btn-ctrl btn-reset">↺ REINICIAR</button>
+            <div class="sim-primary-ctrls">
+              <button id="btn-sim-launch" class="btn-ctrl btn-launch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 5px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                INICIAR LANZAMIENTO
+              </button>
+              <button id="btn-sim-pause" class="btn-ctrl btn-pause">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                PAUSAR
+              </button>
+              <button id="btn-sim-step" class="btn-ctrl btn-step">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                AVANZAR UN PASO
+              </button>
+              <button id="btn-sim-reset" class="btn-ctrl btn-reset">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                REINICIAR
+              </button>
+            </div>
+
+            <div class="sim-speed-selector-bar">
+              <span class="speed-label">VELOCIDAD:</span>
+              <button type="button" class="btn-sim-speed" data-speed="0.5">0,5x</button>
+              <button type="button" class="btn-sim-speed active" data-speed="1.0">1x</button>
+              <button type="button" class="btn-sim-speed" data-speed="2.0">2x</button>
+              <button type="button" class="btn-sim-speed" data-speed="4.0">4x</button>
+            </div>
           </div>
         </main>
 
@@ -2124,8 +2316,23 @@
             </div>
 
             <div class="telemetry-metric-card">
+              <div class="metric-title">Método Activo</div>
+              <div id="telem-method" class="metric-number" style="font-size: 1.05rem; color: var(--electric-blue);">Euler (1º orden)</div>
+            </div>
+
+            <div class="telemetry-metric-card">
+              <div class="metric-title">Paso de Integración ($h$)</div>
+              <div id="telem-step" class="metric-number" style="font-size: 1.15rem; color: var(--sky-blue);">h = 2,00 s</div>
+            </div>
+
+            <div class="telemetry-metric-card">
+              <div class="metric-title">Altura Máxima ($y_{\max}$)</div>
+              <div id="telem-max-alt" class="metric-number" style="font-size: 1.15rem; color: var(--mission-orange);">589,2 m</div>
+            </div>
+
+            <div class="telemetry-metric-card">
               <div class="metric-title">Estado de Vuelo</div>
-              <div id="telem-status" class="metric-number" style="font-size: 1.1rem; color: var(--terminal-green);">LISTO EN PAD</div>
+              <div id="telem-status" class="metric-number" style="font-size: 1.05rem; color: var(--terminal-green);">LISTO EN PLATAFORMA</div>
             </div>
           </div>
         </aside>
